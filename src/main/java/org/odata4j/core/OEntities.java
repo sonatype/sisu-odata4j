@@ -1,5 +1,7 @@
 package org.odata4j.core;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -25,14 +27,28 @@ public class OEntities {
    * @return the new entity
    */
   public static OEntity create(EdmEntitySet entitySet, OEntityKey entityKey, List<OProperty<?>> properties, List<OLink> links) {
-    return new OEntityImpl(entitySet, entityKey, true, properties, links);
+    return new OEntityImpl(entitySet, null, entityKey, true, properties, links);
   }
 
   /**
    * Creates a new entity.
    *
    * @param entitySet  the entity-set
-   * @param entityType the entity type
+   * @param entityKey  the entity-key
+   * @param properties  the entity properties, if any
+   * @param links  the entity links, if any
+   * @param extensions  entity extensions, if any
+   * @return the new entity
+   */
+  public static OEntity create(EdmEntitySet entitySet, OEntityKey entityKey, List<OProperty<?>> properties, List<OLink> links, Object... extensions) {
+    return new OEntityImpl(entitySet, null, entityKey, true, properties, links, extensions);
+  }
+
+  /**
+   * Creates a new entity.
+   *
+   * @param entitySet  the entity-set
+   * @param entityType  the entity type
    * @param entityKey  the entity-key
    * @param properties  the entity properties, if any
    * @param links  the entity links, if any
@@ -52,13 +68,14 @@ public class OEntities {
    * @return the new entity
    */
   public static OEntity createRequest(EdmEntitySet entitySet, List<OProperty<?>> properties, List<OLink> links) {
-    return new OEntityImpl(entitySet, null, false, properties, links);
+    return new OEntityImpl(entitySet, null, null, false, properties, links);
   }
 
   /**
    * Creates a new entity with additional Atom information.
    *
    * @param entitySet  the entity-set
+   * @param entityType  the entity type
    * @param entityKey  the entity-key
    * @param properties  the entity properties, if any
    * @param links  the entity links, if any
@@ -114,12 +131,9 @@ public class OEntities {
     private final OEntityKey entityKey;
     private final List<OProperty<?>> properties;
     private final List<OLink> links;
+    private final Collection<Object> extensions;
 
-    public OEntityImpl(EdmEntitySet entitySet, OEntityKey entityKey, boolean entityKeyRequired, List<OProperty<?>> properties, List<OLink> links) {
-      this(entitySet, null, entityKey, entityKeyRequired, properties, links);
-    }
-
-    public OEntityImpl(EdmEntitySet entitySet, EdmEntityType entityType, OEntityKey entityKey, boolean entityKeyRequired, List<OProperty<?>> properties, List<OLink> links) {
+    OEntityImpl(EdmEntitySet entitySet, EdmEntityType entityType, OEntityKey entityKey, boolean entityKeyRequired, List<OProperty<?>> properties, List<OLink> links, Object... extensions) {
       if (entitySet == null)
         throw new IllegalArgumentException("entitySet cannot be null");
       if (entityKeyRequired && entityKey == null)
@@ -130,6 +144,7 @@ public class OEntities {
       this.entityKey = entityKey;
       this.properties = Collections.unmodifiableList(properties);
       this.links = Collections.unmodifiableList(links);
+      this.extensions = Arrays.asList(extensions);
     }
 
     @Override
@@ -144,9 +159,7 @@ public class OEntities {
 
     @Override
     public EdmEntityType getEntityType() {
-      return null == entityType
-          ? (null == entitySet ? null : entitySet.getType())
-          : entityType;
+      return entityType != null ? entityType : entitySet != null ? entitySet.getType() : null;
     }
 
     @Override
@@ -192,6 +205,16 @@ public class OEntities {
     @Override
     public EdmType getType() {
       return this.entitySet.getType();
+    }
+
+    @Override
+    public <TExtension extends OExtension<OEntity>> TExtension findExtension(Class<TExtension> clazz) {
+      for (Object extension : extensions) {
+        if (clazz.isInstance(extension)) {
+          return clazz.cast(extension);
+        }
+      }
+      return null;
     }
 
   }

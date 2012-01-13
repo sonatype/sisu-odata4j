@@ -112,7 +112,7 @@ public class JPQLGenerator {
       return tableAlias + "." + field;
 */    String alias = fieldAliases.get(field);
       if (alias != null) {
-        field = alias;
+        return alias;
       }
       return tableAlias != null ? tableAlias + "." + field : field;
 /*--------------------------------------------------------------------------*/

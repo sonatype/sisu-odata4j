@@ -251,7 +251,7 @@ diff -rwu ../odata4j/odata4j-core/src/main/java/org/odata4j/producer/jpa/JPASkip
          }
 diff -rwu ../odata4j/odata4j-core/src/main/java/org/odata4j/producer/jpa/JPQLGenerator.java src/main/java/org/odata4j/producer/jpa/JPQLGenerator.java
 --- ../odata4j/odata4j-core/src/main/java/org/odata4j/producer/jpa/JPQLGenerator.java	2011-11-29 00:21:37.000000000 +0000
-+++ src/main/java/org/odata4j/producer/jpa/JPQLGenerator.java	2012-01-13 02:01:31.000000000 +0000
++++ src/main/java/org/odata4j/producer/jpa/JPQLGenerator.java	2012-01-13 02:14:24.000000000 +0000
 @@ -1,6 +1,11 @@
  package org.odata4j.producer.jpa;
  
@@ -303,7 +303,7 @@ diff -rwu ../odata4j/odata4j-core/src/main/java/org/odata4j/producer/jpa/JPQLGen
        return tableAlias + "." + field;
 +*/    String alias = fieldAliases.get(field);
 +      if (alias != null) {
-+        field = alias;
++        return alias;
 +      }
 +      return tableAlias != null ? tableAlias + "." + field : field;
 +/*--------------------------------------------------------------------------*/

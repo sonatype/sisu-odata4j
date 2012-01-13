@@ -1,6 +1,6 @@
-diff -rwu ../odata4j/odata4j-core/src/main/java/org/odata4j/core/OEntityKey.java src/main/java/org/odata4j/core/OEntityKey.java
+diff -ru --strip-trailing-cr ../odata4j/odata4j-core/src/main/java/org/odata4j/core/OEntityKey.java src/main/java/org/odata4j/core/OEntityKey.java
 --- ../odata4j/odata4j-core/src/main/java/org/odata4j/core/OEntityKey.java	2011-11-29 00:21:37.000000000 +0000
-+++ src/main/java/org/odata4j/core/OEntityKey.java	2012-01-10 13:37:54.000000000 +0000
++++ src/main/java/org/odata4j/core/OEntityKey.java	2012-01-13 14:20:04.000000000 +0000
 @@ -126,7 +126,10 @@
     * @param keyString  a standard key-string
     * @return a newly-created entity-key
@@ -41,9 +41,9 @@ diff -rwu ../odata4j/odata4j-core/src/main/java/org/odata4j/core/OEntityKey.java
        } catch (Exception e) {
          throw new IllegalArgumentException(String.format("bad valueString [%s] as part of keyString [%s]", valueString, keyString), e);
        }
-diff -rwu ../odata4j/odata4j-core/src/main/java/org/odata4j/core/OSimpleObjects.java src/main/java/org/odata4j/core/OSimpleObjects.java
+diff -ru --strip-trailing-cr ../odata4j/odata4j-core/src/main/java/org/odata4j/core/OSimpleObjects.java src/main/java/org/odata4j/core/OSimpleObjects.java
 --- ../odata4j/odata4j-core/src/main/java/org/odata4j/core/OSimpleObjects.java	2011-12-13 12:58:56.000000000 +0000
-+++ src/main/java/org/odata4j/core/OSimpleObjects.java	2012-01-10 13:37:54.000000000 +0000
++++ src/main/java/org/odata4j/core/OSimpleObjects.java	2012-01-13 14:20:04.000000000 +0000
 @@ -8,8 +8,13 @@
  import org.odata4j.edm.EdmSimpleType;
  import org.odata4j.internal.InternalUtil;
@@ -58,9 +58,9 @@ diff -rwu ../odata4j/odata4j-core/src/main/java/org/odata4j/core/OSimpleObjects.
  
  /**
   * A static factory to create immutable {@link OSimpleObject} instances.
-diff -rwu ../odata4j/odata4j-core/src/main/java/org/odata4j/expression/ExpressionParser.java src/main/java/org/odata4j/expression/ExpressionParser.java
+diff -ru --strip-trailing-cr ../odata4j/odata4j-core/src/main/java/org/odata4j/expression/ExpressionParser.java src/main/java/org/odata4j/expression/ExpressionParser.java
 --- ../odata4j/odata4j-core/src/main/java/org/odata4j/expression/ExpressionParser.java	2011-12-22 02:03:59.000000000 +0000
-+++ src/main/java/org/odata4j/expression/ExpressionParser.java	2012-01-10 13:37:54.000000000 +0000
++++ src/main/java/org/odata4j/expression/ExpressionParser.java	2012-01-13 14:20:04.000000000 +0000
 @@ -16,8 +16,13 @@
  import org.odata4j.core.Guid;
  import org.odata4j.expression.OrderByExpression.Direction;
@@ -120,9 +120,9 @@ diff -rwu ../odata4j/odata4j-core/src/main/java/org/odata4j/expression/Expressio
          return Expression.and((BoolCommonExpression) lhs, (BoolCommonExpression) rhs);
        }
      });
-diff -rwu ../odata4j/odata4j-core/src/main/java/org/odata4j/expression/FilterExpressionVisitor.java src/main/java/org/odata4j/expression/FilterExpressionVisitor.java
+diff -ru --strip-trailing-cr ../odata4j/odata4j-core/src/main/java/org/odata4j/expression/FilterExpressionVisitor.java src/main/java/org/odata4j/expression/FilterExpressionVisitor.java
 --- ../odata4j/odata4j-core/src/main/java/org/odata4j/expression/FilterExpressionVisitor.java	2011-11-29 00:21:37.000000000 +0000
-+++ src/main/java/org/odata4j/expression/FilterExpressionVisitor.java	2012-01-10 13:37:54.000000000 +0000
++++ src/main/java/org/odata4j/expression/FilterExpressionVisitor.java	2012-01-13 14:20:04.000000000 +0000
 @@ -2,7 +2,11 @@
  
  import org.odata4j.expression.OrderByExpression.Direction;
@@ -135,9 +135,9 @@ diff -rwu ../odata4j/odata4j-core/src/main/java/org/odata4j/expression/FilterExp
  
  public class FilterExpressionVisitor implements ExpressionVisitor {
  
-diff -rwu ../odata4j/odata4j-core/src/main/java/org/odata4j/expression/PrintExpressionVisitor.java src/main/java/org/odata4j/expression/PrintExpressionVisitor.java
+diff -ru --strip-trailing-cr ../odata4j/odata4j-core/src/main/java/org/odata4j/expression/PrintExpressionVisitor.java src/main/java/org/odata4j/expression/PrintExpressionVisitor.java
 --- ../odata4j/odata4j-core/src/main/java/org/odata4j/expression/PrintExpressionVisitor.java	2011-11-29 00:21:37.000000000 +0000
-+++ src/main/java/org/odata4j/expression/PrintExpressionVisitor.java	2012-01-10 13:37:54.000000000 +0000
++++ src/main/java/org/odata4j/expression/PrintExpressionVisitor.java	2012-01-13 14:20:04.000000000 +0000
 @@ -2,7 +2,11 @@
  
  import org.odata4j.expression.OrderByExpression.Direction;
@@ -150,9 +150,9 @@ diff -rwu ../odata4j/odata4j-core/src/main/java/org/odata4j/expression/PrintExpr
  
  public class PrintExpressionVisitor implements ExpressionVisitor {
  
-diff -rwu ../odata4j/odata4j-core/src/main/java/org/odata4j/internal/InternalUtil.java src/main/java/org/odata4j/internal/InternalUtil.java
+diff -ru --strip-trailing-cr ../odata4j/odata4j-core/src/main/java/org/odata4j/internal/InternalUtil.java src/main/java/org/odata4j/internal/InternalUtil.java
 --- ../odata4j/odata4j-core/src/main/java/org/odata4j/internal/InternalUtil.java	2011-12-13 12:58:56.000000000 +0000
-+++ src/main/java/org/odata4j/internal/InternalUtil.java	2012-01-10 13:37:54.000000000 +0000
++++ src/main/java/org/odata4j/internal/InternalUtil.java	2012-01-13 14:20:04.000000000 +0000
 @@ -29,10 +29,12 @@
  import org.odata4j.core.ORelatedEntitiesLinkInline;
  import org.odata4j.core.ORelatedEntityLink;
@@ -196,9 +196,9 @@ diff -rwu ../odata4j/odata4j-core/src/main/java/org/odata4j/internal/InternalUti
  
    @SuppressWarnings("unchecked")
    private static <T> Constructor<T> findDefaultDeclaredConstructor(
-diff -rwu ../odata4j/odata4j-core/src/main/java/org/odata4j/producer/jpa/JPASkipToken.java src/main/java/org/odata4j/producer/jpa/JPASkipToken.java
+diff -ru --strip-trailing-cr ../odata4j/odata4j-core/src/main/java/org/odata4j/producer/jpa/JPASkipToken.java src/main/java/org/odata4j/producer/jpa/JPASkipToken.java
 --- ../odata4j/odata4j-core/src/main/java/org/odata4j/producer/jpa/JPASkipToken.java	2011-12-22 02:03:59.000000000 +0000
-+++ src/main/java/org/odata4j/producer/jpa/JPASkipToken.java	2012-01-10 13:37:54.000000000 +0000
++++ src/main/java/org/odata4j/producer/jpa/JPASkipToken.java	2012-01-13 14:20:04.000000000 +0000
 @@ -36,7 +36,10 @@
      return Enumerable.create(values).join(",");
    }
@@ -249,9 +249,9 @@ diff -rwu ../odata4j/odata4j-core/src/main/java/org/odata4j/producer/jpa/JPASkip
                Expression.literal(earlierKeyProperty.getValue()));
            subPredicate = Expression.and(eq, subPredicate);
          }
-diff -rwu ../odata4j/odata4j-core/src/main/java/org/odata4j/producer/jpa/JPQLGenerator.java src/main/java/org/odata4j/producer/jpa/JPQLGenerator.java
+diff -ru --strip-trailing-cr ../odata4j/odata4j-core/src/main/java/org/odata4j/producer/jpa/JPQLGenerator.java src/main/java/org/odata4j/producer/jpa/JPQLGenerator.java
 --- ../odata4j/odata4j-core/src/main/java/org/odata4j/producer/jpa/JPQLGenerator.java	2011-11-29 00:21:37.000000000 +0000
-+++ src/main/java/org/odata4j/producer/jpa/JPQLGenerator.java	2012-01-13 02:14:24.000000000 +0000
++++ src/main/java/org/odata4j/producer/jpa/JPQLGenerator.java	2012-01-13 14:20:04.000000000 +0000
 @@ -1,6 +1,11 @@
  package org.odata4j.producer.jpa;
  
@@ -395,9 +395,9 @@ diff -rwu ../odata4j/odata4j-core/src/main/java/org/odata4j/producer/jpa/JPQLGen
      }
  
      throw new UnsupportedOperationException("unsupported expression " + expression);
-diff -rwu ../odata4j/odata4j-core/src/main/java/org/odata4j/producer/resources/OptionsQueryParser.java src/main/java/org/odata4j/producer/resources/OptionsQueryParser.java
+diff -ru --strip-trailing-cr ../odata4j/odata4j-core/src/main/java/org/odata4j/producer/resources/OptionsQueryParser.java src/main/java/org/odata4j/producer/resources/OptionsQueryParser.java
 --- ../odata4j/odata4j-core/src/main/java/org/odata4j/producer/resources/OptionsQueryParser.java	2011-11-29 00:21:37.000000000 +0000
-+++ src/main/java/org/odata4j/producer/resources/OptionsQueryParser.java	2012-01-10 13:37:54.000000000 +0000
++++ src/main/java/org/odata4j/producer/resources/OptionsQueryParser.java	2012-01-13 14:20:04.000000000 +0000
 @@ -9,6 +9,9 @@
  import org.odata4j.expression.BoolCommonExpression;
  import org.odata4j.expression.CommonExpression;

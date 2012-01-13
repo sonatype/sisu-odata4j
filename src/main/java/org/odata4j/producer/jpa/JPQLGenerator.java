@@ -1,6 +1,11 @@
 package org.odata4j.producer.jpa;
 
 import java.sql.Timestamp;
+/*--------------------------- sisu-odata4j-patch ---------------------------*/
+import java.util.Collections;
+import java.util.Locale;
+import java.util.Map;
+/*--------------------------------------------------------------------------*/
 
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
@@ -47,10 +52,21 @@ public class JPQLGenerator {
 
   private final String primaryKeyName;
   private final String tableAlias;
+/*--------------------------- sisu-odata4j-patch ---------------------------*/
+  private final Map<String, String> fieldAliases;
+/*--------------------------------------------------------------------------*/
 
   public JPQLGenerator(String primaryKeyName, String tableAlias) {
+/*--------------------------- sisu-odata4j-patch ---------------------------*/
+    this(primaryKeyName, tableAlias, Collections.<String, String>emptyMap());
+  }
+  public JPQLGenerator(String primaryKeyName, String tableAlias, Map<String, String> fieldAliases) {
+/*--------------------------------------------------------------------------*/
     this.primaryKeyName = primaryKeyName;
     this.tableAlias = tableAlias;
+/*--------------------------- sisu-odata4j-patch ---------------------------*/
+    this.fieldAliases = fieldAliases;
+/*--------------------------------------------------------------------------*/
   }
 
   public String getPrimaryKeyName() {
@@ -83,13 +99,23 @@ public class JPQLGenerator {
       return toJpql((BoolCommonExpression) expression);
 
     if (expression instanceof EntitySimpleProperty) {
+/*--------------------------- sisu-odata4j-patch ---------------------------*\
       String field = ((EntitySimpleProperty) expression).getPropertyName();
+*/    String field = ((EntitySimpleProperty) expression).getPropertyName().toUpperCase(Locale.ENGLISH);
+/*--------------------------------------------------------------------------*/
 
       field = field.equals(primaryKeyName)
           ? primaryKeyName
           : field.replace("/", ".");
 
+/*--------------------------- sisu-odata4j-patch ---------------------------*\
       return tableAlias + "." + field;
+*/    String alias = fieldAliases.get(field);
+      if (alias != null) {
+        field = alias;
+      }
+      return tableAlias != null ? tableAlias + "." + field : field;
+/*--------------------------------------------------------------------------*/
     }
 
     if (expression instanceof NullLiteral || expression == null)

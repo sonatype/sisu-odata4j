@@ -5,6 +5,7 @@ import java.util.Map;
 import org.odata4j.core.OEntity;
 import org.odata4j.core.OEntityId;
 import org.odata4j.core.OEntityKey;
+import org.odata4j.core.OExtensible;
 import org.odata4j.core.OFunctionParameter;
 import org.odata4j.edm.EdmDataServices;
 import org.odata4j.edm.EdmFunctionImport;
@@ -18,7 +19,7 @@ import org.odata4j.producer.edm.MetadataProducer;
  *
  * <p>Note that all client requests/responses are normalized - all details involving the OData http protocol, query expression model, EDM structure are handled by odata4j at a higher level.</p>
  */
-public interface ODataProducer {
+public interface ODataProducer extends OExtensible<ODataProducer> {
 
   /**
    * Obtains the service metadata for this producer.
@@ -52,15 +53,16 @@ public interface ODataProducer {
    * @return count of the entities
    */
   CountResponse getEntitiesCount(String entitySetName, QueryInfo queryInfo);
-  
+
   /**
-   * Obtains a single entity based on its type and key. Also honors $select and $expand in queryInfo
-   * @param entitySetName the entity-set name for entities to return
-   * @param entityKey the unique entity-key of the entity to start with
-   * @param queryInfo the additional constraints to apply to the entities
+   * Obtains a single entity based on its type and key.
+   *
+   * @param entitySetName  the entity-set name for entities to return
+   * @param entityKey  the unique entity-key of the entity to start with
+   * @param queryInfo  the additional constraints applicable to single-entity queries
    * @return the resulting entity
    */
-  EntityResponse getEntity(String entitySetName, OEntityKey entityKey, QueryInfo queryInfo);
+  EntityResponse getEntity(String entitySetName, OEntityKey entityKey, EntityQueryInfo queryInfo);
 
   /**
    * Given a specific entity, follow one of its navigation properties, applying constraints as appropriate.
@@ -187,7 +189,7 @@ public interface ODataProducer {
   void deleteLink(OEntityId sourceEntity, String targetNavProp, OEntityKey targetEntityKey);
 
   /**
-   * Call a function (aka Service Operation)
+   * Calls a function (aka Service Operation).
    *
    * @param name  the name of the function
    * @param params  the parameters to the function

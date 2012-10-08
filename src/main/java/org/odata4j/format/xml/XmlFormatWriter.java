@@ -1,5 +1,6 @@
 package org.odata4j.format.xml;
 
+import java.math.BigDecimal;
 import java.util.Iterator;
 import java.util.List;
 
@@ -26,7 +27,6 @@ import org.odata4j.edm.EdmSimpleType;
 import org.odata4j.edm.EdmType;
 import org.odata4j.internal.InternalUtil;
 import org.odata4j.repack.org.apache.commons.codec.binary.Base64;
-import org.odata4j.repack.org.apache.commons.codec.binary.Hex;
 import org.odata4j.stax2.QName2;
 import org.odata4j.stax2.XMLWriter2;
 
@@ -55,10 +55,13 @@ public class XmlFormatWriter {
 
   @SuppressWarnings("unchecked")
   protected void writeProperty(XMLWriter2 writer, String name, EdmType type, Object value, boolean isDocumentElement, boolean writeType) {
-    if (isDocumentElement)
-      writer.startElement(new QName2(name), d);
-    else
-      writer.startElement(new QName2(d, name, "d"));
+
+    writer.startElement(new QName2(d, name, "d"));
+
+    if (isDocumentElement) {
+      writer.writeNamespace("m", m);
+      writer.writeNamespace("d", d);
+    }
 
     String sValue = null;
 
@@ -110,12 +113,15 @@ public class XmlFormatWriter {
         }
       } else if (type == EdmSimpleType.BYTE) {
         if (value != null) {
-          sValue = Hex.encodeHexString(
-              new byte[] { (Byte) value });
+          sValue = value.toString();
+        }
+      } else if (type == EdmSimpleType.SBYTE) {
+        if (value != null) {
+          sValue = value.toString();
         }
       } else if (type == EdmSimpleType.DECIMAL) {
         if (value != null) {
-          sValue = value.toString();
+          sValue = ((BigDecimal) value).toPlainString();
         }
       } else if (type == EdmSimpleType.SINGLE) {
         if (value != null) {
@@ -131,7 +137,7 @@ public class XmlFormatWriter {
         }
       } else if (type == EdmSimpleType.DATETIME) {
         if (value != null)
-          sValue = InternalUtil.formatDateTime(
+          sValue = InternalUtil.formatDateTimeForXml(
               (LocalDateTime) value);
       } else if (type == EdmSimpleType.BINARY) {
         byte[] bValue = (byte[]) value;
@@ -144,13 +150,13 @@ public class XmlFormatWriter {
         }
       } else if (type == EdmSimpleType.TIME) {
         if (value != null) {
-          sValue = InternalUtil.toString((LocalTime) value);
+          sValue = InternalUtil.formatTimeForXml((LocalTime) value);
         }
       } else if (type == EdmSimpleType.DATETIMEOFFSET) {
         // Edm.DateTimeOffset '-'? yyyy '-' mm '-' dd 'T' hh ':' mm
         // ':' ss ('.' s+)? (zzzzzz)?
         if (value != null) {
-          sValue = InternalUtil.formatDateTimeOffset((DateTime) value);
+          sValue = InternalUtil.formatDateTimeOffsetForXml((DateTime) value);
         }
       } else {
         throw new UnsupportedOperationException("Implement " + type);
@@ -162,8 +168,8 @@ public class XmlFormatWriter {
     } else if (sValue != null) {
       writer.writeText(sValue);
     }
-    writer.endElement(name);
 
+    writer.endElement(name);
   }
 
   private OAtomEntity getAtomInfo(OEntity oe) {

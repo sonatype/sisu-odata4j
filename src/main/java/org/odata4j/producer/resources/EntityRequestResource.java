@@ -1,5 +1,8 @@
 package org.odata4j.producer.resources;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.logging.Logger;
 
@@ -18,16 +21,22 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ContextResolver;
 
 import org.odata4j.core.ODataConstants;
+import org.odata4j.core.ODataHttpMethod;
 import org.odata4j.core.OEntity;
 import org.odata4j.core.OEntityIds;
 import org.odata4j.core.OEntityKey;
+import org.odata4j.edm.EdmEntitySet;
+import org.odata4j.exceptions.BadRequestException;
+import org.odata4j.exceptions.MethodNotAllowedException;
+import org.odata4j.exceptions.NotFoundException;
 import org.odata4j.format.FormatWriter;
 import org.odata4j.format.FormatWriterFactory;
+import org.odata4j.producer.EntityQueryInfo;
 import org.odata4j.producer.EntityResponse;
 import org.odata4j.producer.ODataProducer;
-import org.odata4j.producer.QueryInfo;
+import org.odata4j.producer.OMediaLinkExtension;
 
-@Path("{entitySetName}{id: (\\(.+?\\))}")
+@Path("{entitySetName: [^/()]+?}{id: \\(.+?\\)}")
 public class EntityRequestResource extends BaseResource {
 
   private static final Logger log = Logger.getLogger(EntityRequestResource.class.getName());
@@ -36,15 +45,85 @@ public class EntityRequestResource extends BaseResource {
   public Response updateEntity(@Context HttpHeaders httpHeaders, @Context UriInfo uriInfo, @Context ContextResolver<ODataProducer> producerResolver,
       @PathParam("entitySetName") String entitySetName,
       @PathParam("id") String id,
-      String payload) {
+      InputStream payload) throws Exception {
 
     log.info(String.format("updateEntity(%s,%s)", entitySetName, id));
 
     ODataProducer producer = producerResolver.getContext(ODataProducer.class);
 
+    // is this a new media resource?
+    // check for HasStream
+    EdmEntitySet entitySet = producer.getMetadata().findEdmEntitySet(entitySetName);
+    if (entitySet == null) {
+      throw new NotFoundException();
+    }
+
+    if (Boolean.TRUE.equals(entitySet.getType().getHasStream())) { // getHasStream can return null
+      // yes it is!
+      return updateMediaLinkEntry(httpHeaders, uriInfo, producer, entitySet, payload, OEntityKey.parse(id));
+    }
+
     OEntity entity = this.getRequestEntity(httpHeaders, uriInfo, payload, producer.getMetadata(), entitySetName, OEntityKey.parse(id));
     producer.updateEntity(entitySetName, entity);
 
+    // TODO: hmmh..isn't this supposed to be HTTP 204 No Content?
+    return Response.ok().header(ODataConstants.Headers.DATA_SERVICE_VERSION, ODataConstants.DATA_SERVICE_VERSION_HEADER).build();
+  }
+
+  /**
+   * Updates an entity given a String payload.
+   * Note: currently this exists because EntitiesRequestResource processBatch needs
+   *       a version with a String payload.  It may be possible (desirable?) to
+   *       re-write batch handling completely such that it streamed individual batch
+   *       items instead of loading the entire batch payload into memory and then
+   *       processing the batch items.
+   */
+  protected Response updateEntity(HttpHeaders httpHeaders, UriInfo uriInfo, ContextResolver<ODataProducer> producerResolver,
+      String entitySetName,
+      String id,
+      String payload) throws Exception {
+
+    log.info(String.format("updateEntity(%s,%s)", entitySetName, id));
+
+    ODataProducer producer = producerResolver.getContext(ODataProducer.class);
+
+    // is this a new media resource?
+    // check for HasStream
+    EdmEntitySet entitySet = producer.getMetadata().findEdmEntitySet(entitySetName);
+    if (entitySet == null) {
+      throw new NotFoundException();
+    }
+
+    if (Boolean.TRUE.equals(entitySet.getType().getHasStream())) { // getHasStream can return null
+      // yes it is!
+      ByteArrayInputStream inStream = new ByteArrayInputStream(payload.getBytes());
+      try {
+        return updateMediaLinkEntry(httpHeaders, uriInfo, producer, entitySet, inStream, OEntityKey.parse(id));
+      } finally {
+        inStream.close();
+      }
+    }
+
+    OEntity entity = this.getRequestEntity(httpHeaders, uriInfo, payload, producer.getMetadata(), entitySetName, OEntityKey.parse(id));
+    producer.updateEntity(entitySetName, entity);
+
+    // TODO: hmmh..isn't this supposed to be HTTP 204 No Content?
+    return Response.ok().header(ODataConstants.Headers.DATA_SERVICE_VERSION, ODataConstants.DATA_SERVICE_VERSION_HEADER).build();
+  }
+
+  /**
+   * Updates the media resource found in the payload for the media link entry (mle)
+   * identified by the given key.
+   *
+   * @return HTTP 204 No Content response if successful.
+   */
+  protected Response updateMediaLinkEntry(HttpHeaders httpHeaders,
+      UriInfo uriInfo, ODataProducer producer, EdmEntitySet entitySet, InputStream payload, OEntityKey key) throws IOException {
+
+    @SuppressWarnings("unused")
+    OEntity mle = super.createOrUpdateMediaLinkEntry(httpHeaders, uriInfo, entitySet, producer, payload, key);
+
+    // TODO: hmmh..isn't this supposed to be HTTP 204 No Content?
     return Response.ok().header(ODataConstants.Headers.DATA_SERVICE_VERSION, ODataConstants.DATA_SERVICE_VERSION_HEADER).build();
   }
 
@@ -65,12 +144,14 @@ public class EntityRequestResource extends BaseResource {
       OEntity entity = this.getRequestEntity(httpHeaders, uriInfo, payload, producer.getMetadata(), entitySetName, entityKey);
       producer.mergeEntity(entitySetName, entity);
 
+      // TODO: hmmh..isn't this supposed to be HTTP 204 No Content?
       return Response.ok().header(ODataConstants.Headers.DATA_SERVICE_VERSION, ODataConstants.DATA_SERVICE_VERSION_HEADER).build();
     }
 
     if ("DELETE".equals(method)) {
       producer.deleteEntity(entitySetName, entityKey);
 
+      // TODO: hmmh..isn't this supposed to be HTTP 204 No Content?
       return Response.ok().header(ODataConstants.Headers.DATA_SERVICE_VERSION, ODataConstants.DATA_SERVICE_VERSION_HEADER).build();
     }
 
@@ -78,24 +159,60 @@ public class EntityRequestResource extends BaseResource {
       OEntity entity = this.getRequestEntity(httpHeaders, uriInfo, payload, producer.getMetadata(), entitySetName, OEntityKey.parse(id));
       producer.updateEntity(entitySetName, entity);
 
+      // TODO: hmmh..isn't this supposed to be HTTP 204 No Content?
       return Response.ok().header(ODataConstants.Headers.DATA_SERVICE_VERSION, ODataConstants.DATA_SERVICE_VERSION_HEADER).build();
     }
 
-    throw new RuntimeException("Expected a tunnelled PUT, MERGE or DELETE");
+    if (method != null)
+      throw new RuntimeException("Expected a tunnelled PUT, MERGE or DELETE");
+    else
+      throw new MethodNotAllowedException("POST is not allowed for an entity");
   }
 
   @DELETE
-  public Response deleteEntity(@Context ContextResolver<ODataProducer> producerResolver,
+  public Response deleteEntity(@Context HttpHeaders httpHeaders, @Context UriInfo uriInfo,
+      @Context ContextResolver<ODataProducer> producerResolver,
+      @QueryParam("$format") String format,
+      @QueryParam("$callback") String callback,
       @PathParam("entitySetName") String entitySetName,
-      @PathParam("id") String id) {
+      @PathParam("id") String id) throws Exception {
 
-    log.info(String.format("getEntity(%s,%s)", entitySetName, id));
+    log.info(String.format("deleteEntity(%s,%s)", entitySetName, id));
 
     ODataProducer producer = producerResolver.getContext(ODataProducer.class);
 
+    // the OData URI scheme makes it impossible to have unique @Paths that refer
+    // to functions and entity sets
+    if (producer.getMetadata().findEdmFunctionImport(entitySetName) != null) {
+      // functions that return collections of entities should support the
+      // same set of query options as entity set queries so give them everything.
+      return FunctionResource.callFunction(ODataHttpMethod.DELETE, httpHeaders, uriInfo, producer, entitySetName, format, callback, null);
+    }
+
     OEntityKey entityKey = OEntityKey.parse(id);
+
+    // is this a new media resource?
+    // check for HasStream
+    EdmEntitySet entitySet = producer.getMetadata().findEdmEntitySet(entitySetName);
+    if (entitySet == null) {
+      throw new NotFoundException();
+    }
+
+    if (Boolean.TRUE.equals(entitySet.getType().getHasStream())) { // getHasStream can return null
+      // yes it is!
+      // first, the producer must support OMediaLinkExtension
+      OMediaLinkExtension mediaLinkExtension = getMediaLinkExtension(httpHeaders, uriInfo, entitySet, producer);
+
+      // get a media link entry from the extension
+      OEntity mle = mediaLinkExtension.getMediaLinkEntryForUpdateOrDelete(entitySet, entityKey, httpHeaders);
+      mediaLinkExtension.deleteStream(mle, null /* QueryInfo, may need to get rid of */);
+      // TODO: hmmh..isn't this supposed to be HTTP 204 No Content?
+      return Response.ok().header(ODataConstants.Headers.DATA_SERVICE_VERSION, ODataConstants.DATA_SERVICE_VERSION_HEADER).build();
+    }
+
     producer.deleteEntity(entitySetName, entityKey);
 
+    // TODO: hmmh..isn't this supposed to be HTTP 204 No Content?
     return Response.ok().header(ODataConstants.Headers.DATA_SERVICE_VERSION, ODataConstants.DATA_SERVICE_VERSION_HEADER).build();
   }
 
@@ -121,8 +238,8 @@ public class EntityRequestResource extends BaseResource {
       String expand,
       String select) {
 
-    QueryInfo query = new QueryInfo(
-        null, null, null, null, null, null,
+    EntityQueryInfo query = new EntityQueryInfo(
+        null,
         OptionsQueryParser.parseCustomOptions(uriInfo),
         OptionsQueryParser.parseExpand(expand),
         OptionsQueryParser.parseSelect(select));
@@ -134,7 +251,12 @@ public class EntityRequestResource extends BaseResource {
         expand,
         select));
 
-    EntityResponse response = producer.getEntity(entitySetName, OEntityKey.parse(id), query);
+    EntityResponse response;
+    try {
+      response = producer.getEntity(entitySetName, OEntityKey.parse(id), query);
+    } catch (IllegalArgumentException e) {
+      throw new BadRequestException("Illegal key " + id, e);
+    }
 
     StringWriter sw = new StringWriter();
     FormatWriter<EntityResponse> fw = FormatWriterFactory.getFormatWriter(EntityResponse.class, httpHeaders.getAcceptableMediaTypes(), format, callback);
@@ -156,7 +278,12 @@ public class EntityRequestResource extends BaseResource {
     return new LinksRequestResource(OEntityIds.create(entitySetName, OEntityKey.parse(id)), targetNavProp, targetEntityKey);
   }
 
-  @Path("{navProp:.+}")
+  @Path("{first: \\$}value")
+  public ValueRequestResource getValue() {
+    return new ValueRequestResource();
+  }
+
+  @Path("{navProp: .+}")
   public PropertyRequestResource getNavProperty() {
     return new PropertyRequestResource();
   }

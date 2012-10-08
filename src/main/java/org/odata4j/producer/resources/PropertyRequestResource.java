@@ -25,6 +25,8 @@ import org.odata4j.core.OEntity;
 import org.odata4j.core.OEntityKey;
 import org.odata4j.edm.EdmDataServices;
 import org.odata4j.edm.EdmEntitySet;
+import org.odata4j.exceptions.NotFoundException;
+import org.odata4j.exceptions.NotImplementedException;
 import org.odata4j.format.FormatWriter;
 import org.odata4j.format.FormatWriterFactory;
 import org.odata4j.internal.InternalUtil;
@@ -35,8 +37,6 @@ import org.odata4j.producer.EntityResponse;
 import org.odata4j.producer.ODataProducer;
 import org.odata4j.producer.PropertyResponse;
 import org.odata4j.producer.QueryInfo;
-import org.odata4j.producer.exceptions.NotFoundException;
-import org.odata4j.producer.exceptions.NotImplementedException;
 
 public class PropertyRequestResource extends BaseResource {
 
@@ -179,7 +179,9 @@ public class PropertyRequestResource extends BaseResource {
           .ok(entity, ODataConstants.TEXT_PLAIN_CHARSET_UTF8)
           .header(ODataConstants.Headers.DATA_SERVICE_VERSION, version.asString)
           .build();
-    } else {
+    }
+    else {
+
       BaseResponse response = producer.getNavProperty(
           entitySetName,
           OEntityKey.parse(id),

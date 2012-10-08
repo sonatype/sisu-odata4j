@@ -8,6 +8,7 @@ import org.joda.time.LocalTime;
 import org.odata4j.core.Guid;
 import org.odata4j.core.OSimpleObject;
 import org.odata4j.core.OSimpleObjects;
+import org.odata4j.core.UnsignedByte;
 import org.odata4j.edm.EdmSimpleType;
 import org.odata4j.expression.ExpressionParser.AggregateFunction;
 import org.odata4j.expression.OrderByExpression.Direction;
@@ -72,8 +73,12 @@ public class Expression {
     return new BinaryLiteralImpl(value);
   }
 
-  public static ByteLiteral byte_(byte value) {
+  public static ByteLiteral byte_(UnsignedByte value) {
     return new ByteLiteralImpl(value);
+  }
+
+  public static SByteLiteral sbyte_(byte value) {
+    return new SByteLiteralImpl(value);
   }
 
   public static SingleLiteral single(float value) {
@@ -310,8 +315,9 @@ public class Expression {
     if (edmType.equals(EdmSimpleType.TIME))
       return time((LocalTime) prop.getValue());
     if (edmType.equals(EdmSimpleType.BYTE))
-      return byte_((Byte) prop.getValue());
-
+      return byte_((UnsignedByte) prop.getValue());
+    if (edmType.equals(EdmSimpleType.SBYTE))
+      return sbyte_((Byte) prop.getValue());
     throw new UnsupportedOperationException("Cannot infer literal expression type for edm type: " + edmType);
   }
 
@@ -320,6 +326,8 @@ public class Expression {
       return ((BinaryLiteral) expression).getValue();
     if (expression instanceof ByteLiteral)
       return ((ByteLiteral) expression).getValue();
+    if (expression instanceof SByteLiteral)
+      return ((SByteLiteral) expression).getValue();
     if (expression instanceof BooleanLiteral)
       return ((BooleanLiteral) expression).getValue();
     if (expression instanceof DateTimeLiteral)
@@ -447,10 +455,29 @@ public class Expression {
   }
 
   private static class ByteLiteralImpl extends ExpressionImpl implements ByteLiteral {
+    private final UnsignedByte value;
+
+    public ByteLiteralImpl(UnsignedByte value) {
+      super(ByteLiteral.class);
+      this.value = value;
+    }
+
+    @Override
+    public UnsignedByte getValue() {
+      return value;
+    }
+
+    @Override
+    void visitThis(ExpressionVisitor visitor) {
+      visitor.visit(this);
+    }
+  }
+
+  private static class SByteLiteralImpl extends ExpressionImpl implements SByteLiteral {
     private final byte value;
 
-    public ByteLiteralImpl(byte value) {
-      super(ByteLiteral.class);
+    public SByteLiteralImpl(byte value) {
+      super(SByteLiteral.class);
       this.value = value;
     }
 
@@ -1343,7 +1370,7 @@ public class Expression {
       visitor.beforeDescend();
       getSource().visit(visitor);
       visitor.betweenDescend();
-      if (null != getPredicate()) {
+      if (getPredicate() != null) {
         getPredicate().visit(visitor);
       }
       visitor.afterDescend();

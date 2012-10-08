@@ -2,20 +2,30 @@ package org.odata4j.stax2.staximpl;
 
 import java.io.Reader;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
+import javax.xml.stream.events.Characters;
 import javax.xml.stream.events.EndElement;
+import javax.xml.stream.events.Namespace;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
+import org.core4j.Enumerable;
+import org.odata4j.core.Throwables;
 import org.odata4j.stax2.Attribute2;
+import org.odata4j.stax2.Characters2;
 import org.odata4j.stax2.EndElement2;
+import org.odata4j.stax2.Namespace2;
 import org.odata4j.stax2.QName2;
 import org.odata4j.stax2.StartElement2;
 import org.odata4j.stax2.XMLEvent2;
@@ -68,7 +78,7 @@ public class StaxXMLFactoryProvider2 extends XMLFactoryProvider2 {
         XMLEventReader real = factory.createXMLEventReader(reader);
         return new StaxXMLEventReader2(real);
       } catch (XMLStreamException e) {
-        throw new RuntimeException(e);
+        throw Throwables.propagate(e);
       }
     }
 
@@ -86,7 +96,7 @@ public class StaxXMLFactoryProvider2 extends XMLFactoryProvider2 {
       try {
         return real.getElementText();
       } catch (XMLStreamException e) {
-        throw new RuntimeException(e);
+        throw Throwables.propagate(e);
       }
     }
 
@@ -100,7 +110,7 @@ public class StaxXMLFactoryProvider2 extends XMLFactoryProvider2 {
       try {
         return new StaxXMLEvent2(real.nextEvent());
       } catch (XMLStreamException e) {
-        throw new RuntimeException(e);
+        throw Throwables.propagate(e);
       }
     }
 
@@ -126,7 +136,7 @@ public class StaxXMLFactoryProvider2 extends XMLFactoryProvider2 {
         XMLEventWriter real = factory.createXMLEventWriter(writer);
         return new StaxXMLEventWriter2(real);
       } catch (XMLStreamException e) {
-        throw new RuntimeException(e);
+        throw Throwables.propagate(e);
       }
 
     }
@@ -146,7 +156,7 @@ public class StaxXMLFactoryProvider2 extends XMLFactoryProvider2 {
       try {
         real.add(realXMLEvent);
       } catch (XMLStreamException e) {
-        throw new RuntimeException(e);
+        throw Throwables.propagate(e);
       }
     }
 
@@ -157,6 +167,27 @@ public class StaxXMLFactoryProvider2 extends XMLFactoryProvider2 {
 
     public StaxXMLEvent2(XMLEvent real) {
       this.real = real;
+    }
+
+    @Override
+    public String toString() {
+      return String.format("%s[%s]", StaxXMLEvent2.class.getSimpleName(), getEventTypeName());
+    }
+
+    private String getEventTypeName() {
+      switch (real.getEventType()) {
+        case XMLStreamConstants.START_ELEMENT: return "START_ELEMENT";
+        case XMLStreamConstants.END_ELEMENT: return "END_ELEMENT";
+        case XMLStreamConstants.CHARACTERS: return "CHARACTERS";
+        case XMLStreamConstants.ATTRIBUTE: return "ATTRIBUTE";
+        case XMLStreamConstants.NAMESPACE: return "NAMESPACE";
+        case XMLStreamConstants.PROCESSING_INSTRUCTION: return "PROCESSING_INSTRUCTION";
+        case XMLStreamConstants.COMMENT: return "COMMENT";
+        case XMLStreamConstants.START_DOCUMENT: return "START_DOCUMENT";
+        case XMLStreamConstants.END_DOCUMENT: return "END_DOCUMENT";
+        case XMLStreamConstants.DTD: return "DTD";
+        default: return "UNKNOWN TYPE " + real.getEventType();
+      }
     }
 
     public XMLEvent getXMLEvent() {
@@ -174,6 +205,11 @@ public class StaxXMLFactoryProvider2 extends XMLFactoryProvider2 {
     }
 
     @Override
+    public Characters2 asCharacters() {
+      return new StaxCharacters2(real.asCharacters());
+    }
+
+    @Override
     public boolean isEndElement() {
       return real.isEndElement();
     }
@@ -182,6 +218,12 @@ public class StaxXMLFactoryProvider2 extends XMLFactoryProvider2 {
     public boolean isStartElement() {
       return real.isStartElement();
     }
+
+    @Override
+    public boolean isCharacters() {
+      return real.isCharacters();
+    }
+
   }
 
   private static class StaxEndElement2 implements EndElement2 {
@@ -197,8 +239,8 @@ public class StaxXMLFactoryProvider2 extends XMLFactoryProvider2 {
     }
   }
 
-  private static class StaxStartElement2 implements StartElement2 {
-    private final StartElement real;
+  public static class StaxStartElement2 implements StartElement2 {
+    public final StartElement real;
 
     public StaxStartElement2(StartElement real) {
       this.real = real;
@@ -221,10 +263,53 @@ public class StaxXMLFactoryProvider2 extends XMLFactoryProvider2 {
         return null;
       return new StaxAttribute2(att);
     }
+
+    @Override
+    public Enumerable<Attribute2> getAttributes() {
+      Iterator i = real.getAttributes();
+      List<Attribute2> atts = new ArrayList<Attribute2>();
+      while (i.hasNext()) {
+        atts.add(new StaxAttribute2((Attribute) i.next()));
+      }
+      return Enumerable.create(atts);
+    }
+
+    @Override
+    public Enumerable<Namespace2> getNamespaces() {
+      Iterator i = real.getNamespaces();
+      List<Namespace2> namespaces = new ArrayList<Namespace2>();
+      while (i.hasNext()) {
+        namespaces.add(new StaxNamespace2((Namespace) i.next()));
+      }
+      return Enumerable.create(namespaces);
+    }
+  }
+
+  private static class StaxNamespace2 extends StaxAttribute2 implements Namespace2 {
+
+    public StaxNamespace2(Namespace real) {
+      super(real);
+    }
+
+    @Override
+    public String getNamespaceURI() {
+      return ((Namespace) real).getNamespaceURI();
+    }
+
+    @Override
+    public String getPrefix() {
+      return ((Namespace) real).getPrefix();
+    }
+
+    @Override
+    public boolean isDefaultNamespaceDeclaration() {
+      return ((Namespace) real).isDefaultNamespaceDeclaration();
+    }
+
   }
 
   private static class StaxAttribute2 implements Attribute2 {
-    private final Attribute real;
+    protected final Attribute real;
 
     public StaxAttribute2(Attribute real) {
       this.real = real;
@@ -234,6 +319,26 @@ public class StaxXMLFactoryProvider2 extends XMLFactoryProvider2 {
     public String getValue() {
       return real.getValue();
     }
+
+    @Override
+    public QName2 getName() {
+      return new QName2(real.getName().getNamespaceURI(),
+          real.getName().getLocalPart(), real.getName().getPrefix());
+    }
+  }
+
+  private static class StaxCharacters2 implements Characters2 {
+    protected final Characters real;
+
+    public StaxCharacters2(Characters real) {
+      this.real = real;
+    }
+
+    @Override
+    public String getData() {
+      return real.getData();
+    }
+
   }
 
 }

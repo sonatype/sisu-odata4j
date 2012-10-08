@@ -66,7 +66,7 @@ public class HeaderMap extends HashMap<String, List<String>> implements Multival
 
   @Override
   public void putAll(Map<? extends String, ? extends List<String>> map) {
-    for (Entry<? extends String, ? extends List<String>> e : map.entrySet())
+    for (Map.Entry<? extends String, ? extends List<String>> e : map.entrySet())
       this.put(e.getKey(), e.getValue());
   }
 

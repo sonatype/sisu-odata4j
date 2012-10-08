@@ -52,7 +52,7 @@ public class FilterExpressionVisitor implements ExpressionVisitor {
 
   @Override
   public void visit(DoubleLiteral expr) {
-    push(Double.toString(expr.getValue()));
+    push(Double.toString(expr.getValue()) + "d");
   }
 
   @Override
@@ -72,22 +72,22 @@ public class FilterExpressionVisitor implements ExpressionVisitor {
 
   @Override
   public void visit(DateTimeLiteral expr) {
-    push("datetime'" + InternalUtil.formatDateTime(expr.getValue()) + "'");
+    push("datetime'" + InternalUtil.formatDateTimeForXml(expr.getValue()) + "'");
   }
 
   @Override
   public void visit(DateTimeOffsetLiteral expr) {
-    push("datetimeoffset'" + InternalUtil.formatDateTimeOffset(expr.getValue()) + "'");
+    push("datetimeoffset'" + InternalUtil.formatDateTimeOffsetForXml(expr.getValue()) + "'");
   }
 
   @Override
   public void visit(TimeLiteral expr) {
-    push("time'" + InternalUtil.toString(expr.getValue()) + "'");
+    push("time'" + InternalUtil.formatTimeForXml(expr.getValue()) + "'");
   }
 
   @Override
   public void visit(ByteLiteral expr) {
-    push(Hex.encodeHexString(new byte[] { expr.getValue() }));
+    push(Integer.toString(expr.getValue().intValue()));
   }
 
   // non-literals, not supported at the moment
@@ -120,6 +120,11 @@ public class FilterExpressionVisitor implements ExpressionVisitor {
   @Override
   public void visit(OrderByExpression expr) {
     throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void visit(SByteLiteral expr) {
+    push(Byte.toString(expr.getValue()));
   }
 
   @Override

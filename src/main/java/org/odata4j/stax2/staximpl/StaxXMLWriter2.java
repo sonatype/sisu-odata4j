@@ -11,6 +11,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
 import org.core4j.Enumerable;
+import org.odata4j.core.ODataConstants.Charsets;
+import org.odata4j.core.Throwables;
 import org.odata4j.stax2.QName2;
 import org.odata4j.stax2.XMLWriter2;
 
@@ -30,7 +32,7 @@ public class StaxXMLWriter2 implements XMLWriter2 {
       eventWriter.setDefaultNamespace("");
 
     } catch (XMLStreamException e) {
-      throw new RuntimeException(e);
+      throw Throwables.propagate(e);
     }
 
   }
@@ -39,15 +41,15 @@ public class StaxXMLWriter2 implements XMLWriter2 {
   // try {
   // eventWriter.setPrefix(prefix, namespaceUri);
   // } catch (XMLStreamException e) {
-  // throw new RuntimeException(e);
+  // throw Throwables.propagate(e);
   // }
   // }
-  // 
+  //
   // public void setDefaultNamespace( String namespaceUri){
   // try {
   // eventWriter.setDefaultNamespace(namespaceUri);
   // } catch (XMLStreamException e) {
-  // throw new RuntimeException(e);
+  // throw Throwables.propagate(e);
   // }
   // }
 
@@ -72,7 +74,7 @@ public class StaxXMLWriter2 implements XMLWriter2 {
       eventWriter.add(event);
 
     } catch (XMLStreamException e) {
-      throw new RuntimeException(e);
+      throw Throwables.propagate(e);
     }
 
   }
@@ -84,7 +86,7 @@ public class StaxXMLWriter2 implements XMLWriter2 {
       eventWriter.add(event);
 
     } catch (XMLStreamException e) {
-      throw new RuntimeException(e);
+      throw Throwables.propagate(e);
     }
   }
 
@@ -95,7 +97,7 @@ public class StaxXMLWriter2 implements XMLWriter2 {
       eventWriter.add(event);
 
     } catch (XMLStreamException e) {
-      throw new RuntimeException(e);
+      throw Throwables.propagate(e);
     }
   }
 
@@ -106,7 +108,7 @@ public class StaxXMLWriter2 implements XMLWriter2 {
       eventWriter.add(event);
 
     } catch (XMLStreamException e) {
-      throw new RuntimeException(e);
+      throw Throwables.propagate(e);
     }
   }
 
@@ -116,16 +118,16 @@ public class StaxXMLWriter2 implements XMLWriter2 {
       XMLEvent event = eventFactory.createNamespace(prefix, namespaceUri);
       eventWriter.add(event);
     } catch (XMLStreamException e) {
-      throw new RuntimeException(e);
+      throw Throwables.propagate(e);
     }
 
   }
 
   public void startDocument() {
     try {
-      eventWriter.add(eventFactory.createStartDocument("utf-8", "1.0", true));
+      eventWriter.add(eventFactory.createStartDocument(Charsets.Lower.UTF_8, "1.0", true));
     } catch (XMLStreamException e) {
-      throw new RuntimeException(e);
+      throw Throwables.propagate(e);
     }
 
   }
@@ -136,7 +138,7 @@ public class StaxXMLWriter2 implements XMLWriter2 {
       XMLEvent event = eventFactory.createEndElement(new QName(localName), null);
       eventWriter.add(event);
     } catch (XMLStreamException e) {
-      throw new RuntimeException(e);
+      throw Throwables.propagate(e);
     }
 
   }
@@ -149,7 +151,7 @@ public class StaxXMLWriter2 implements XMLWriter2 {
       eventWriter.add(event);
       eventWriter.flush();
     } catch (XMLStreamException e) {
-      throw new RuntimeException(e);
+      throw Throwables.propagate(e);
     }
 
   }

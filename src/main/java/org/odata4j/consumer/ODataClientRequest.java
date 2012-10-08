@@ -8,7 +8,11 @@ import org.odata4j.format.Entry;
 import org.odata4j.format.SingleLink;
 
 /**
- * Generic OData http request builder.  Only interesting for developers of custom {@link OClientBehavior} implementations.
+ * Generic OData http request builder used by the low-level {@link ODataClient} api.
+ *
+ * <p>Also interesting for developers of custom {@link OClientBehavior} implementations.</p>
+ *
+ * @see ODataClient
  */
 public class ODataClientRequest {
 
@@ -28,7 +32,7 @@ public class ODataClientRequest {
 
   /**
    * Gets the request http method.
-   * 
+   *
    * @return the http method
    */
   public String getMethod() {
@@ -37,7 +41,7 @@ public class ODataClientRequest {
 
   /**
    * Gets the request url.
-   * 
+   *
    * @return the url
    */
   public String getUrl() {
@@ -46,7 +50,7 @@ public class ODataClientRequest {
 
   /**
    * Gets the request http headers.
-   * 
+   *
    * @return the headers
    */
   public Map<String, String> getHeaders() {
@@ -55,7 +59,7 @@ public class ODataClientRequest {
 
   /**
    * Gets the request query parameters.
-   * 
+   *
    * @return the query parameters
    */
   public Map<String, String> getQueryParams() {
@@ -64,7 +68,7 @@ public class ODataClientRequest {
 
   /**
    * Gets the normalized OData payload.
-   * 
+   *
    * @return the normalized OData payload
    */
   public Object getPayload() {
@@ -73,7 +77,7 @@ public class ODataClientRequest {
 
   /**
    * Creates a new GET request.
-   * 
+   *
    * @param url  the request url
    * @return a new request builder
    */
@@ -83,7 +87,7 @@ public class ODataClientRequest {
 
   /**
    * Creates a new POST request.
-   * 
+   *
    * @param url  the request url
    * @param entry  the normalized OData payload
    * @return a new request builder
@@ -94,7 +98,7 @@ public class ODataClientRequest {
 
   /**
    * Creates a new POST request.
-   * 
+   *
    * @param url  the request url
    * @param link  the link
    * @return a new request builder
@@ -105,7 +109,7 @@ public class ODataClientRequest {
 
   /**
    * Creates a new PUT request.
-   * 
+   *
    * @param url  the request url
    * @param entry  the normalized OData payload
    * @return a new request builder
@@ -116,7 +120,7 @@ public class ODataClientRequest {
 
   /**
    * Creates a new PUT request.
-   * 
+   *
    * @param url  the request url
    * @param link  the link
    * @return a new request builder
@@ -127,7 +131,7 @@ public class ODataClientRequest {
 
   /**
    * Creates a new MERGE request.
-   * 
+   *
    * @param url  the request url
    * @param entry  the normalized OData payload
    * @return a new request builder
@@ -138,7 +142,7 @@ public class ODataClientRequest {
 
   /**
    * Creates a new MERGE request.
-   * 
+   *
    * @param url  the request url
    * @param link  the link
    * @return a new request builder
@@ -149,7 +153,7 @@ public class ODataClientRequest {
 
   /**
    * Creates a new DELETE request.
-   * 
+   *
    * @param url  the request url
    * @return a new request builder
    */
@@ -158,8 +162,20 @@ public class ODataClientRequest {
   }
 
   /**
+   * Sets a request query parameter.
+   *
+   * @param name  the query parameter name
+   * @param value  the query parameter value
+   * @return the request builder
+   */
+  public ODataClientRequest queryParam(String name, String value) {
+    this.getQueryParams().put(name, value);
+    return new ODataClientRequest(this.getMethod(), this.getUrl(), this.getHeaders(), this.getQueryParams(), this.getPayload());
+  }
+
+  /**
    * Sets an http request header.
-   * 
+   *
    * @param name  the header name
    * @param value  the header value
    * @return the request builder
@@ -170,55 +186,12 @@ public class ODataClientRequest {
   }
 
   /**
-   * Sets a request query parameter.
-   * 
-   * @param name  the query parameter name
-   * @param value  the query parameter value
-   * @return the request builder
-   */
-  public ODataClientRequest queryParam(String name, String value) {
-    queryParams.put(name, value);
-    return new ODataClientRequest(method, url, headers, queryParams, payload);
-  }
-
-  /**
-   * Sets the request url.
-   * 
-   * @param url  the request url
-   * @return the request builder
-   */
-  public ODataClientRequest url(String url) {
-    return new ODataClientRequest(method, url, headers, queryParams, payload);
-  }
-
-  /**
    * Sets the http request method.
-   * 
+   *
    * @param method  the method
    * @return the request builder
    */
   public ODataClientRequest method(String method) {
     return new ODataClientRequest(method, url, headers, queryParams, payload);
   }
-
-  /**
-   * Sets the normalized OData payload.
-   * 
-   * @param entry  the entry payload
-   * @return the request builder
-   */
-  public ODataClientRequest entryPayload(Entry entry) {
-    return new ODataClientRequest(method, url, headers, queryParams, entry);
-  }
-
-  /**
-   * Sets the normalized OData payload.
-   * 
-   * @param link  the link payload
-   * @return the request builder
-   */
-  public ODataClientRequest linkPayload(SingleLink link) {
-    return new ODataClientRequest(method, url, headers, queryParams, link);
-  }
-
 }

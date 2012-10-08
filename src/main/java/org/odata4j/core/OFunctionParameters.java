@@ -2,11 +2,11 @@ package org.odata4j.core;
 
 import org.odata4j.edm.EdmSimpleType;
 import org.odata4j.edm.EdmType;
+import org.odata4j.exceptions.NotImplementedException;
 import org.odata4j.expression.CommonExpression;
 import org.odata4j.expression.Expression;
 import org.odata4j.expression.ExpressionParser;
 import org.odata4j.expression.LiteralExpression;
-import org.odata4j.producer.exceptions.NotImplementedException;
 
 /**
  * A static factory to create immutable {@link OFunctionParameter} instances.
@@ -55,10 +55,13 @@ public class OFunctionParameters {
       // parser gave us an Integer
       v = Short.valueOf(((Number) val).shortValue());
     } else if (type.equals(EdmSimpleType.SINGLE) && (!(val instanceof Float))) {
-      // parser gave us an Double
+      // parser gave us a Single
       v = new Float(((Number) val).floatValue());
-    } else if (type.equals(EdmSimpleType.BYTE) && (!(val instanceof Byte))) {
-      // parser gave us an Double
+    } else if (type.equals(EdmSimpleType.BYTE) && (!(val instanceof UnsignedByte))) {
+      // parser gave us an Edm.Byte
+      v = UnsignedByte.valueOf(((Number) val).intValue());
+    } else if (type.equals(EdmSimpleType.SBYTE) && (!(val instanceof Byte))) {
+      // parser gave us a SByte
       v = Byte.valueOf(((Number) val).byteValue());
     }
     return v;

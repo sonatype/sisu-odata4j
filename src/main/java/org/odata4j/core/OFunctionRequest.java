@@ -8,7 +8,7 @@ import org.core4j.Enumerable;
 import org.joda.time.LocalDateTime;
 
 /**
- * A consumer-side function-request builder.  Call {@link #execute()} or simply iterate to issue the request.
+ * A consumer-side function-request builder.  Call {@link #execute()} to issue the request.
  *
  * <p>Usage example:
  * <pre>
@@ -34,7 +34,10 @@ public interface OFunctionRequest<T> extends OQueryRequest<T> {
   OFunctionRequest<T> pBoolean(String name, boolean value);
 
   /** Adds a byte parameter. */
-  OFunctionRequest<T> pByte(String name, byte value);
+  OFunctionRequest<T> pByte(String name, UnsignedByte value);
+
+  /** Adds a sbyte parameter. */
+  OFunctionRequest<T> pSByte(String name, byte value);
 
   /** Adds a datetime parameter. */
   OFunctionRequest<T> pDateTime(String name, Calendar value);

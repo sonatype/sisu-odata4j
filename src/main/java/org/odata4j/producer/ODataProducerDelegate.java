@@ -6,6 +6,7 @@ import org.odata4j.core.Delegate;
 import org.odata4j.core.OEntity;
 import org.odata4j.core.OEntityId;
 import org.odata4j.core.OEntityKey;
+import org.odata4j.core.OExtension;
 import org.odata4j.core.OFunctionParameter;
 import org.odata4j.edm.EdmDataServices;
 import org.odata4j.edm.EdmFunctionImport;
@@ -28,14 +29,14 @@ public abstract class ODataProducerDelegate implements Delegate<ODataProducer>, 
   public EntitiesResponse getEntities(String entitySetName, QueryInfo queryInfo) {
     return getDelegate().getEntities(entitySetName, queryInfo);
   }
-  
+
   @Override
   public CountResponse getEntitiesCount(String entitySetName, QueryInfo queryInfo) {
     return getDelegate().getEntitiesCount(entitySetName, queryInfo);
   }
-  
+
   @Override
-  public EntityResponse getEntity(String entitySetName, OEntityKey entityKey, QueryInfo queryInfo) {
+  public EntityResponse getEntity(String entitySetName, OEntityKey entityKey, EntityQueryInfo queryInfo) {
     return getDelegate().getEntity(entitySetName, entityKey, queryInfo);
   }
 
@@ -104,4 +105,8 @@ public abstract class ODataProducerDelegate implements Delegate<ODataProducer>, 
     return getDelegate().callFunction(name, params, queryInfo);
   }
 
+  @Override
+  public <TExtension extends OExtension<ODataProducer>> TExtension findExtension(Class<TExtension> clazz) {
+    return getDelegate().findExtension(clazz);
+  }
 }

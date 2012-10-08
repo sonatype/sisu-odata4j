@@ -6,10 +6,13 @@ import java.io.Writer;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.core4j.Enumerable;
 import org.core4j.ReadOnlyIterator;
-import org.odata4j.internal.PlatformUtil;
+import org.odata4j.core.Throwables;
+import org.odata4j.internal.AndroidCompat;
 import org.odata4j.stax2.Attribute2;
 import org.odata4j.stax2.EndElement2;
+import org.odata4j.stax2.Namespace2;
 import org.odata4j.stax2.QName2;
 import org.odata4j.stax2.StartElement2;
 import org.odata4j.stax2.XMLEvent2;
@@ -20,6 +23,7 @@ import org.odata4j.stax2.XMLInputFactory2;
 import org.odata4j.stax2.XMLOutputFactory2;
 import org.odata4j.stax2.XMLWriter2;
 import org.odata4j.stax2.XMLWriterFactory2;
+import org.odata4j.stax2.util.InMemoryXMLEvent2;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -91,7 +95,7 @@ public class DomXMLFactoryProvider2 extends XMLFactoryProvider2 {
         Document document = builder.parse(new InputSource(reader));
         return new DomXMLEventReader2(document);
       } catch (Exception e) {
-        throw new RuntimeException(e);
+        throw Throwables.propagate(e);
       }
 
     }
@@ -133,18 +137,18 @@ public class DomXMLFactoryProvider2 extends XMLFactoryProvider2 {
       }
 
       public String getElementText() {
-        return PlatformUtil.getTextContent(current);
+        return AndroidCompat.getTextContent(current);
       }
 
       private IterationResult<XMLEvent2> startElement2() {
-        Object o = new DomStartElement2(current);
-        XMLEvent2 event = new DomXMLEvent2(o);
+        DomStartElement2 start = new DomStartElement2(current);
+        XMLEvent2 event = new InMemoryXMLEvent2(start, null, null);
         return IterationResult.next(event);
       }
 
       private IterationResult<XMLEvent2> endElement2() {
-        Object o = new DomEndElement2(current);
-        XMLEvent2 event = new DomXMLEvent2(o);
+        DomEndElement2 end = new DomEndElement2(current);
+        XMLEvent2 event = new InMemoryXMLEvent2(null, end, null);
         return IterationResult.next(event);
       }
 
@@ -229,6 +233,11 @@ public class DomXMLFactoryProvider2 extends XMLFactoryProvider2 {
         public String getValue() {
           return attr.getValue();
         }
+
+        @Override
+        public QName2 getName() {
+          throw new UnsupportedOperationException("Not supported yet.");
+        }
       };
 
     }
@@ -240,7 +249,17 @@ public class DomXMLFactoryProvider2 extends XMLFactoryProvider2 {
 
     @Override
     public String toString() {
-      return "StartElement " + getName() + " " + PlatformUtil.getTextContent(element);
+      return "StartElement " + getName() + " " + AndroidCompat.getTextContent(element);
+    }
+
+    @Override
+    public Enumerable<Attribute2> getAttributes() {
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public Enumerable<Namespace2> getNamespaces() {
+      throw new UnsupportedOperationException("Not supported yet.");
     }
 
   }
@@ -260,42 +279,7 @@ public class DomXMLFactoryProvider2 extends XMLFactoryProvider2 {
 
     @Override
     public String toString() {
-      return "EndElement " + getName() + " " + PlatformUtil.getTextContent(element);
-    }
-
-  }
-
-  private static class DomXMLEvent2 implements XMLEvent2 {
-
-    private final Object event;
-
-    public DomXMLEvent2(Object event) {
-      this.event = event;
-    }
-
-    @Override
-    public EndElement2 asEndElement() {
-      return (EndElement2) event;
-    }
-
-    @Override
-    public StartElement2 asStartElement() {
-      return (StartElement2) event;
-    }
-
-    @Override
-    public boolean isEndElement() {
-      return event instanceof EndElement2;
-    }
-
-    @Override
-    public boolean isStartElement() {
-      return event instanceof StartElement2;
-    }
-
-    @Override
-    public String toString() {
-      return event.toString();
+      return "EndElement " + getName() + " " + AndroidCompat.getTextContent(element);
     }
 
   }

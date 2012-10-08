@@ -284,10 +284,10 @@ index e6f90c8..60bf495 100644
  public class PrintExpressionVisitor implements ExpressionVisitor {
  
 diff --git a/src/main/java/org/odata4j/internal/InternalUtil.java b/src/main/java/org/odata4j/internal/InternalUtil.java
-index 47ac36a..a4be132 100644
+index e2316a5..e4a1864 100644
 --- a/src/main/java/org/odata4j/internal/InternalUtil.java
 +++ b/src/main/java/org/odata4j/internal/InternalUtil.java
-@@ -34,7 +34,9 @@ import org.odata4j.core.ORelatedEntitiesLinkInline;
+@@ -33,7 +33,9 @@ import org.odata4j.core.ORelatedEntitiesLinkInline;
  import org.odata4j.core.ORelatedEntityLink;
  import org.odata4j.core.Throwables;
  import org.odata4j.edm.EdmEntitySet;
@@ -297,7 +297,7 @@ index 47ac36a..a4be132 100644
  
  public class InternalUtil {
  
-@@ -232,6 +234,7 @@ public class InternalUtil {
+@@ -229,6 +231,7 @@ public class InternalUtil {
      return rt.toString();
    }
  
@@ -305,7 +305,7 @@ index 47ac36a..a4be132 100644
    @SuppressWarnings("unchecked")
    public static <T> T toEntity(Class<T> entityType, OEntity oe) {
      if (entityType.equals(OEntity.class))
-@@ -291,6 +294,7 @@ public class InternalUtil {
+@@ -288,6 +291,7 @@ public class InternalUtil {
      }
  
    }

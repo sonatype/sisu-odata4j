@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.core4j.Enumerable;
 import org.core4j.Func;
+import org.core4j.Func1;
+import org.core4j.Predicate1;
 import org.odata4j.core.ImmutableList;
 import org.odata4j.core.Named;
 import org.odata4j.core.OPredicates;
@@ -43,7 +45,9 @@ public class EdmEntityType extends EdmStructuralType {
     this.alias = alias;
     this.hasStream = hasStream;
 
-    this.keys = keys == null || keys.isEmpty() ? null : keys;
+    this.keys = (keys == null || keys.isEmpty()) ?
+        (baseType == null ? findConventionalKeys() : null) :
+        keys;
 
     if (baseType == null && this.keys == null)
       throw new IllegalArgumentException("Root types must have keys");
@@ -51,6 +55,15 @@ public class EdmEntityType extends EdmStructuralType {
       throw new IllegalArgumentException("Keys on root types only");
 
     this.navigationProperties = navigationProperties;
+  }
+
+  private List<String> findConventionalKeys() {
+    for (EdmProperty prop : getProperties()) {
+      if (prop.getName().equalsIgnoreCase("Id") && prop.getType().isSimple() && !prop.isNullable()) {
+        return Enumerable.create(prop.getName()).toList();
+      }
+    }
+    return null;
   }
 
   public String getAlias() {
@@ -131,12 +144,12 @@ public class EdmEntityType extends EdmStructuralType {
       context.register(entityType, this);
       this.alias = entityType.alias;
       this.hasStream = entityType.hasStream;
-      if (null != entityType.keys) {
+      if (entityType.keys != null) {
         // subtypes don't have keys!
         this.keys.addAll(entityType.keys);
       }
 
-      if (null != entityType.getBaseType()) {
+      if (entityType.getBaseType() != null) {
         baseTypeBuilder = EdmEntityType.newBuilder(entityType.getBaseType(), context);
       }
 
@@ -204,6 +217,10 @@ public class EdmEntityType extends EdmStructuralType {
       return this;
     }
 
+    public String getAlias() {
+      return alias;
+    }
+
     public String getFQAliasName() {
       // TODO share or remove
       return alias == null ? null : (alias + "." + getName());
@@ -224,6 +241,33 @@ public class EdmEntityType extends EdmStructuralType {
         @Override
         public EdmEntityType apply() {
           return (EdmEntityType) build();
+        }
+      };
+    }
+
+    public static Func1<EdmEntityType.Builder, String> func1_getFullyQualifiedTypeName() {
+      return new Func1<EdmEntityType.Builder, String>() {
+        @Override
+        public String apply(Builder input) {
+          return input.getFullyQualifiedTypeName();
+        }
+      };
+    }
+
+    public static Func1<EdmEntityType.Builder, String> func1_getFQAliasName() {
+      return new Func1<EdmEntityType.Builder, String>() {
+        @Override
+        public String apply(Builder input) {
+          return input.getFQAliasName();
+        }
+      };
+    }
+
+    public static Predicate1<Builder> pred1_hasAlias() {
+      return new Predicate1<EdmEntityType.Builder>() {
+        @Override
+        public boolean apply(Builder input) {
+          return input.getAlias() != null;
         }
       };
     }

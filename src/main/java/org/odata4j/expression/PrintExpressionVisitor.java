@@ -12,6 +12,12 @@ public class PrintExpressionVisitor implements ExpressionVisitor {
 
   private final StringBuilder sb = new StringBuilder();
 
+  public static String asString(CommonExpression expr) {
+    PrintExpressionVisitor v = new PrintExpressionVisitor();
+    expr.visit(v);
+    return v.toString();
+  }
+
   @Override
   public String toString() {
     return sb.toString();
@@ -75,12 +81,12 @@ public class PrintExpressionVisitor implements ExpressionVisitor {
 
   @Override
   public void visit(DateTimeLiteral expr) {
-    append("datetime(%s)", InternalUtil.formatDateTime(expr.getValue()));
+    append("datetime(%s)", InternalUtil.formatDateTimeForXml(expr.getValue()));
   }
 
   @Override
   public void visit(DateTimeOffsetLiteral expr) {
-    append("datetime(%s)", InternalUtil.formatDateTimeOffset(expr.getValue()));
+    append("datetime(%s)", InternalUtil.formatDateTimeOffsetForXml(expr.getValue()));
   }
 
   @Override
@@ -329,8 +335,13 @@ public class PrintExpressionVisitor implements ExpressionVisitor {
   }
 
   @Override
+  public void visit(SByteLiteral expr) {
+    append("sbyte(%s)", expr.getValue());
+  }
+
+  @Override
   public void visit(AggregateAnyFunction expr) {
-    if (null != expr.getVariable()) {
+    if (expr.getVariable() != null) {
       append("any:(%s =>)", expr.getVariable());
     } else {
       append("any()");

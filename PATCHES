@@ -1,7 +1,8 @@
-diff -ru --strip-trailing-cr ../odata4j/odata4j-core/src/main/java/org/odata4j/core/OEntityKey.java src/main/java/org/odata4j/core/OEntityKey.java
---- ../odata4j/odata4j-core/src/main/java/org/odata4j/core/OEntityKey.java	2011-11-29 00:21:37.000000000 +0000
-+++ src/main/java/org/odata4j/core/OEntityKey.java	2012-01-13 14:20:04.000000000 +0000
-@@ -126,7 +126,10 @@
+diff --git a/src/main/java/org/odata4j/core/OEntityKey.java b/src/main/java/org/odata4j/core/OEntityKey.java
+index 9ed4835..a96a3d6 100644
+--- a/src/main/java/org/odata4j/core/OEntityKey.java
++++ b/src/main/java/org/odata4j/core/OEntityKey.java
+@@ -126,7 +126,10 @@ public class OEntityKey {
     * @param keyString  a standard key-string
     * @return a newly-created entity-key
     */
@@ -12,7 +13,7 @@ diff -ru --strip-trailing-cr ../odata4j/odata4j-core/src/main/java/org/odata4j/c
  
      if (keyString == null)
        throw new IllegalArgumentException("keyString cannot be null");
-@@ -143,8 +146,12 @@
+@@ -143,8 +146,12 @@ public class OEntityKey {
  
      String[] tokens = tokens(keyString, ',');
      List<Object> values = new ArrayList<Object>(tokens.length);
@@ -25,7 +26,7 @@ diff -ru --strip-trailing-cr ../odata4j/odata4j-core/src/main/java/org/odata4j/c
        if (nv.length != 1 && nv.length != 2)
          throw new IllegalArgumentException("bad keyString: " + keyString);
        String valueString = nv.length == 1 ? nv[0] : nv[1];
-@@ -152,7 +159,15 @@
+@@ -152,7 +159,15 @@ public class OEntityKey {
          CommonExpression expr = ExpressionParser.parse(valueString);
          LiteralExpression literal = (LiteralExpression) expr;
          Object value = Expression.literalValue(literal);
@@ -41,10 +42,11 @@ diff -ru --strip-trailing-cr ../odata4j/odata4j-core/src/main/java/org/odata4j/c
        } catch (Exception e) {
          throw new IllegalArgumentException(String.format("bad valueString [%s] as part of keyString [%s]", valueString, keyString), e);
        }
-diff -ru --strip-trailing-cr ../odata4j/odata4j-core/src/main/java/org/odata4j/core/OSimpleObjects.java src/main/java/org/odata4j/core/OSimpleObjects.java
---- ../odata4j/odata4j-core/src/main/java/org/odata4j/core/OSimpleObjects.java	2011-12-13 12:58:56.000000000 +0000
-+++ src/main/java/org/odata4j/core/OSimpleObjects.java	2012-01-13 14:20:04.000000000 +0000
-@@ -8,8 +8,13 @@
+diff --git a/src/main/java/org/odata4j/core/OSimpleObjects.java b/src/main/java/org/odata4j/core/OSimpleObjects.java
+index 9892dd4..71f68a3 100644
+--- a/src/main/java/org/odata4j/core/OSimpleObjects.java
++++ b/src/main/java/org/odata4j/core/OSimpleObjects.java
+@@ -8,8 +8,13 @@ import org.joda.time.LocalTime;
  import org.odata4j.edm.EdmSimpleType;
  import org.odata4j.internal.InternalUtil;
  import org.odata4j.internal.TypeConverter;
@@ -58,11 +60,140 @@ diff -ru --strip-trailing-cr ../odata4j/odata4j-core/src/main/java/org/odata4j/c
  
  /**
   * A static factory to create immutable {@link OSimpleObject} instances.
-diff -ru --strip-trailing-cr ../odata4j/odata4j-core/src/main/java/org/odata4j/expression/ExpressionParser.java src/main/java/org/odata4j/expression/ExpressionParser.java
---- ../odata4j/odata4j-core/src/main/java/org/odata4j/expression/ExpressionParser.java	2011-12-22 02:03:59.000000000 +0000
-+++ src/main/java/org/odata4j/expression/ExpressionParser.java	2012-01-13 14:20:04.000000000 +0000
-@@ -16,8 +16,13 @@
- import org.odata4j.core.Guid;
+diff --git a/src/main/java/org/odata4j/exceptions/NotFoundException.java b/src/main/java/org/odata4j/exceptions/NotFoundException.java
+index 63bd696..465981d 100644
+--- a/src/main/java/org/odata4j/exceptions/NotFoundException.java
++++ b/src/main/java/org/odata4j/exceptions/NotFoundException.java
+@@ -1,7 +1,9 @@
+ package org.odata4j.exceptions;
+ 
++/*--------------------------- sisu-odata4j-patch ---------------------------*\
+ import javax.ws.rs.core.Response.Status;
+ import javax.ws.rs.core.Response.StatusType;
++\*--------------------------------------------------------------------------*/
+ 
+ import org.odata4j.core.OError;
+ 
+@@ -25,10 +27,12 @@ public class NotFoundException extends ODataProducerException {
+     super(message, cause);
+   }
+ 
++/*--------------------------- sisu-odata4j-patch ---------------------------*\
+   @Override
+   public StatusType getHttpStatus() {
+     return Status.NOT_FOUND;
+   }
++\*--------------------------------------------------------------------------*/
+ 
+   private NotFoundException(OError error) {
+     super(error);
+@@ -38,7 +42,10 @@ public class NotFoundException extends ODataProducerException {
+ 
+     @Override
+     public int getStatusCode() {
++/*--------------------------- sisu-odata4j-patch ---------------------------*\
+       return Status.NOT_FOUND.getStatusCode();
++*/    return 404;
++/*--------------------------------------------------------------------------*/
+     }
+ 
+     @Override
+diff --git a/src/main/java/org/odata4j/exceptions/NotImplementedException.java b/src/main/java/org/odata4j/exceptions/NotImplementedException.java
+index b710ee3..0af63b8 100644
+--- a/src/main/java/org/odata4j/exceptions/NotImplementedException.java
++++ b/src/main/java/org/odata4j/exceptions/NotImplementedException.java
+@@ -1,7 +1,9 @@
+ package org.odata4j.exceptions;
+ 
++/*--------------------------- sisu-odata4j-patch ---------------------------*\
+ import javax.ws.rs.core.Response.Status.Family;
+ import javax.ws.rs.core.Response.StatusType;
++\*--------------------------------------------------------------------------*/
+ 
+ import org.odata4j.core.OError;
+ 
+@@ -9,6 +11,7 @@ public class NotImplementedException extends ODataProducerException {
+ 
+   private static final long serialVersionUID = 1L;
+ 
++/*--------------------------- sisu-odata4j-patch ---------------------------*\
+   // available in JAX-RS Version 2.0
+   public static final StatusType NOT_IMPLEMENTED = new StatusType() {
+ 
+@@ -24,6 +27,7 @@ public class NotImplementedException extends ODataProducerException {
+       return "Not Implemented";
+     }
+   };
++\*--------------------------------------------------------------------------*/
+ 
+   public NotImplementedException() {
+     this(null, null);
+@@ -41,10 +45,12 @@ public class NotImplementedException extends ODataProducerException {
+     super(message, cause);
+   }
+ 
++/*--------------------------- sisu-odata4j-patch ---------------------------*\
+   @Override
+   public StatusType getHttpStatus() {
+     return NOT_IMPLEMENTED;
+   }
++\*--------------------------------------------------------------------------*/
+ 
+   private NotImplementedException(OError error) {
+     super(error);
+@@ -54,7 +60,10 @@ public class NotImplementedException extends ODataProducerException {
+ 
+     @Override
+     public int getStatusCode() {
++/*--------------------------- sisu-odata4j-patch ---------------------------*\
+       return NOT_IMPLEMENTED.getStatusCode();
++*/    return 501;
++/*--------------------------------------------------------------------------*/
+     }
+ 
+     @Override
+diff --git a/src/main/java/org/odata4j/exceptions/ODataProducerException.java b/src/main/java/org/odata4j/exceptions/ODataProducerException.java
+index 244e36f..6500f8c 100644
+--- a/src/main/java/org/odata4j/exceptions/ODataProducerException.java
++++ b/src/main/java/org/odata4j/exceptions/ODataProducerException.java
+@@ -3,8 +3,10 @@ package org.odata4j.exceptions;
+ import java.io.PrintWriter;
+ import java.io.StringWriter;
+ 
++/*--------------------------- sisu-odata4j-patch ---------------------------*\
+ import javax.ws.rs.core.Response.Status;
+ import javax.ws.rs.core.Response.StatusType;
++\*--------------------------------------------------------------------------*/
+ 
+ import org.odata4j.core.OError;
+ import org.odata4j.core.OErrors;
+@@ -67,8 +69,10 @@ public abstract class ODataProducerException extends RuntimeException {
+   protected String message() {
+     if (getMessage() != null)
+       return getMessage();
++/*--------------------------- sisu-odata4j-patch ---------------------------*\
+     if (getHttpStatus() != null)
+       return getHttpStatus().getReasonPhrase();
++\*--------------------------------------------------------------------------*/
+     return null;
+   }
+ 
+@@ -93,7 +97,9 @@ public abstract class ODataProducerException extends RuntimeException {
+    * @return the HTTP status
+    * @see Status
+    */
++/*--------------------------- sisu-odata4j-patch ---------------------------*\
+   public abstract StatusType getHttpStatus();
++\*--------------------------------------------------------------------------*/
+ 
+   /**
+    * Gets the OData error message.
+diff --git a/src/main/java/org/odata4j/expression/ExpressionParser.java b/src/main/java/org/odata4j/expression/ExpressionParser.java
+index ba6ca2a..cfb0976 100644
+--- a/src/main/java/org/odata4j/expression/ExpressionParser.java
++++ b/src/main/java/org/odata4j/expression/ExpressionParser.java
+@@ -14,8 +14,13 @@ import org.odata4j.core.Guid;
+ import org.odata4j.core.Throwables;
  import org.odata4j.expression.OrderByExpression.Direction;
  import org.odata4j.internal.InternalUtil;
 +/*--------------------------- sisu-odata4j-patch ---------------------------*\
@@ -75,7 +206,7 @@ diff -ru --strip-trailing-cr ../odata4j/odata4j-core/src/main/java/org/odata4j/e
  
  public class ExpressionParser {
  
-@@ -389,7 +394,10 @@
+@@ -387,7 +392,10 @@ public class ExpressionParser {
                List<Token> tokensInsideParens = tokens.subList(afterParenIdx, j);
                CommonExpression expressionInsideParens = readExpression(tokensInsideParens);
                if (!(expressionInsideParens instanceof BoolCommonExpression)) {
@@ -86,7 +217,7 @@ diff -ru --strip-trailing-cr ../odata4j/odata4j-core/src/main/java/org/odata4j/e
                }
                CommonExpression any = Expression.aggregate(
                    aggregateFunction,
-@@ -580,8 +588,16 @@
+@@ -580,8 +588,16 @@ public class ExpressionParser {
      rt = processBinaryExpression(tokens, "or", new Func2<CommonExpression, CommonExpression, CommonExpression>() {
  
        public CommonExpression apply(CommonExpression lhs, CommonExpression rhs) {
@@ -103,7 +234,7 @@ diff -ru --strip-trailing-cr ../odata4j/odata4j-core/src/main/java/org/odata4j/e
          return Expression.or((BoolCommonExpression) lhs, (BoolCommonExpression) rhs);
        }
      });
-@@ -593,8 +609,16 @@
+@@ -593,8 +609,16 @@ public class ExpressionParser {
      rt = processBinaryExpression(tokens, "and", new Func2<CommonExpression, CommonExpression, CommonExpression>() {
  
        public CommonExpression apply(CommonExpression lhs, CommonExpression rhs) {
@@ -120,10 +251,11 @@ diff -ru --strip-trailing-cr ../odata4j/odata4j-core/src/main/java/org/odata4j/e
          return Expression.and((BoolCommonExpression) lhs, (BoolCommonExpression) rhs);
        }
      });
-diff -ru --strip-trailing-cr ../odata4j/odata4j-core/src/main/java/org/odata4j/expression/FilterExpressionVisitor.java src/main/java/org/odata4j/expression/FilterExpressionVisitor.java
---- ../odata4j/odata4j-core/src/main/java/org/odata4j/expression/FilterExpressionVisitor.java	2011-11-29 00:21:37.000000000 +0000
-+++ src/main/java/org/odata4j/expression/FilterExpressionVisitor.java	2012-01-13 14:20:04.000000000 +0000
-@@ -2,7 +2,11 @@
+diff --git a/src/main/java/org/odata4j/expression/FilterExpressionVisitor.java b/src/main/java/org/odata4j/expression/FilterExpressionVisitor.java
+index 2879f47..62e0f75 100644
+--- a/src/main/java/org/odata4j/expression/FilterExpressionVisitor.java
++++ b/src/main/java/org/odata4j/expression/FilterExpressionVisitor.java
+@@ -2,7 +2,11 @@ package org.odata4j.expression;
  
  import org.odata4j.expression.OrderByExpression.Direction;
  import org.odata4j.internal.InternalUtil;
@@ -135,10 +267,11 @@ diff -ru --strip-trailing-cr ../odata4j/odata4j-core/src/main/java/org/odata4j/e
  
  public class FilterExpressionVisitor implements ExpressionVisitor {
  
-diff -ru --strip-trailing-cr ../odata4j/odata4j-core/src/main/java/org/odata4j/expression/PrintExpressionVisitor.java src/main/java/org/odata4j/expression/PrintExpressionVisitor.java
---- ../odata4j/odata4j-core/src/main/java/org/odata4j/expression/PrintExpressionVisitor.java	2011-11-29 00:21:37.000000000 +0000
-+++ src/main/java/org/odata4j/expression/PrintExpressionVisitor.java	2012-01-13 14:20:04.000000000 +0000
-@@ -2,7 +2,11 @@
+diff --git a/src/main/java/org/odata4j/expression/PrintExpressionVisitor.java b/src/main/java/org/odata4j/expression/PrintExpressionVisitor.java
+index e6f90c8..60bf495 100644
+--- a/src/main/java/org/odata4j/expression/PrintExpressionVisitor.java
++++ b/src/main/java/org/odata4j/expression/PrintExpressionVisitor.java
+@@ -2,7 +2,11 @@ package org.odata4j.expression;
  
  import org.odata4j.expression.OrderByExpression.Direction;
  import org.odata4j.internal.InternalUtil;
@@ -150,37 +283,21 @@ diff -ru --strip-trailing-cr ../odata4j/odata4j-core/src/main/java/org/odata4j/e
  
  public class PrintExpressionVisitor implements ExpressionVisitor {
  
-diff -ru --strip-trailing-cr ../odata4j/odata4j-core/src/main/java/org/odata4j/internal/InternalUtil.java src/main/java/org/odata4j/internal/InternalUtil.java
---- ../odata4j/odata4j-core/src/main/java/org/odata4j/internal/InternalUtil.java	2011-12-13 12:58:56.000000000 +0000
-+++ src/main/java/org/odata4j/internal/InternalUtil.java	2012-01-13 14:20:04.000000000 +0000
-@@ -29,10 +29,12 @@
- import org.odata4j.core.ORelatedEntitiesLinkInline;
+diff --git a/src/main/java/org/odata4j/internal/InternalUtil.java b/src/main/java/org/odata4j/internal/InternalUtil.java
+index 47ac36a..a4be132 100644
+--- a/src/main/java/org/odata4j/internal/InternalUtil.java
++++ b/src/main/java/org/odata4j/internal/InternalUtil.java
+@@ -34,7 +34,9 @@ import org.odata4j.core.ORelatedEntitiesLinkInline;
  import org.odata4j.core.ORelatedEntityLink;
+ import org.odata4j.core.Throwables;
  import org.odata4j.edm.EdmEntitySet;
 +/*--------------------------- sisu-odata4j-patch ---------------------------*\
  import org.odata4j.producer.inmemory.BeanModel;
- import org.odata4j.stax2.XMLEventReader2;
- import org.odata4j.stax2.XMLFactoryProvider2;
- import org.odata4j.stax2.XMLInputFactory2;
 +\*--------------------------------------------------------------------------*/
  
  public class InternalUtil {
  
-@@ -126,11 +128,13 @@
-     return dateTime.toString(DATETIME_FORMATTER[idx]);
-   }
- 
-+/*--------------------------- sisu-odata4j-patch ---------------------------*\
-   public static XMLEventReader2 newXMLEventReader(Reader reader) {
-     XMLInputFactory2 f = XMLFactoryProvider2.getInstance()
-         .newXMLInputFactory2();
-     return f.createXMLEventReader(reader);
-   }
-+\*--------------------------------------------------------------------------*/
- 
-   public static String reflectionToString(final Object obj) {
-     StringBuilder rt = new StringBuilder();
-@@ -152,6 +156,7 @@
+@@ -232,6 +234,7 @@ public class InternalUtil {
      return rt.toString();
    }
  
@@ -188,7 +305,7 @@ diff -ru --strip-trailing-cr ../odata4j/odata4j-core/src/main/java/org/odata4j/i
    @SuppressWarnings("unchecked")
    public static <T> T toEntity(Class<T> entityType, OEntity oe) {
      if (entityType.equals(OEntity.class))
-@@ -211,6 +216,7 @@
+@@ -291,6 +294,7 @@ public class InternalUtil {
      }
  
    }
@@ -196,10 +313,11 @@ diff -ru --strip-trailing-cr ../odata4j/odata4j-core/src/main/java/org/odata4j/i
  
    @SuppressWarnings("unchecked")
    private static <T> Constructor<T> findDefaultDeclaredConstructor(
-diff -ru --strip-trailing-cr ../odata4j/odata4j-core/src/main/java/org/odata4j/producer/jpa/JPASkipToken.java src/main/java/org/odata4j/producer/jpa/JPASkipToken.java
---- ../odata4j/odata4j-core/src/main/java/org/odata4j/producer/jpa/JPASkipToken.java	2011-12-22 02:03:59.000000000 +0000
-+++ src/main/java/org/odata4j/producer/jpa/JPASkipToken.java	2012-01-13 14:20:04.000000000 +0000
-@@ -36,7 +36,10 @@
+diff --git a/src/main/java/org/odata4j/producer/jpa/JPASkipToken.java b/src/main/java/org/odata4j/producer/jpa/JPASkipToken.java
+index f8f1c38..491d947 100644
+--- a/src/main/java/org/odata4j/producer/jpa/JPASkipToken.java
++++ b/src/main/java/org/odata4j/producer/jpa/JPASkipToken.java
+@@ -36,7 +36,10 @@ public class JPASkipToken {
      return Enumerable.create(values).join(",");
    }
  
@@ -210,7 +328,7 @@ diff -ru --strip-trailing-cr ../odata4j/odata4j-core/src/main/java/org/odata4j/p
      if (skipToken == null)
        return null;
  
-@@ -75,7 +78,10 @@
+@@ -75,7 +78,10 @@ public class JPASkipToken {
      }
  
      //  k > kvalue
@@ -221,7 +339,7 @@ diff -ru --strip-trailing-cr ../odata4j/odata4j-core/src/main/java/org/odata4j/p
      if (entityKey.getKeyType() == KeyType.SINGLE) {
  
        LiteralExpression entityKeyValue = Expression.literal(entityKey.asSingleValue());
-@@ -91,18 +97,27 @@
+@@ -91,18 +97,27 @@ public class JPASkipToken {
        // k > keyvalue actually means (k.a > kvalue.a) or (k.a = kvalue.a and k.b > kvalue.b) ...
        List<OProperty<?>> keyProperties = new ArrayList<OProperty<?>>(entityKey.asComplexProperties());
        BoolCommonExpression keyPredicate = null;
@@ -249,9 +367,10 @@ diff -ru --strip-trailing-cr ../odata4j/odata4j-core/src/main/java/org/odata4j/p
                Expression.literal(earlierKeyProperty.getValue()));
            subPredicate = Expression.and(eq, subPredicate);
          }
-diff -ru --strip-trailing-cr ../odata4j/odata4j-core/src/main/java/org/odata4j/producer/jpa/JPQLGenerator.java src/main/java/org/odata4j/producer/jpa/JPQLGenerator.java
---- ../odata4j/odata4j-core/src/main/java/org/odata4j/producer/jpa/JPQLGenerator.java	2011-11-29 00:21:37.000000000 +0000
-+++ src/main/java/org/odata4j/producer/jpa/JPQLGenerator.java	2012-01-13 14:20:04.000000000 +0000
+diff --git a/src/main/java/org/odata4j/producer/jpa/JPQLGenerator.java b/src/main/java/org/odata4j/producer/jpa/JPQLGenerator.java
+index 28de1e3..0e4a386 100644
+--- a/src/main/java/org/odata4j/producer/jpa/JPQLGenerator.java
++++ b/src/main/java/org/odata4j/producer/jpa/JPQLGenerator.java
 @@ -1,6 +1,11 @@
  package org.odata4j.producer.jpa;
  
@@ -264,7 +383,7 @@ diff -ru --strip-trailing-cr ../odata4j/odata4j-core/src/main/java/org/odata4j/p
  
  import org.joda.time.DateTimeZone;
  import org.joda.time.LocalDateTime;
-@@ -47,10 +52,21 @@
+@@ -47,10 +52,21 @@ public class JPQLGenerator {
  
    private final String primaryKeyName;
    private final String tableAlias;
@@ -286,7 +405,7 @@ diff -ru --strip-trailing-cr ../odata4j/odata4j-core/src/main/java/org/odata4j/p
    }
  
    public String getPrimaryKeyName() {
-@@ -83,13 +99,23 @@
+@@ -83,13 +99,23 @@ public class JPQLGenerator {
        return toJpql((BoolCommonExpression) expression);
  
      if (expression instanceof EntitySimpleProperty) {
@@ -310,7 +429,7 @@ diff -ru --strip-trailing-cr ../odata4j/odata4j-core/src/main/java/org/odata4j/p
      }
  
      if (expression instanceof NullLiteral || expression == null)
-@@ -139,7 +165,10 @@
+@@ -139,7 +165,10 @@ public class JPQLGenerator {
        length = length != null ? ", " + length : "";
  
        return String.format(
@@ -321,7 +440,7 @@ diff -ru --strip-trailing-cr ../odata4j/odata4j-core/src/main/java/org/odata4j/p
            toJpql(e.getTarget()),
            toJpql(e.getStart()),
            length);
-@@ -182,7 +211,10 @@
+@@ -182,7 +211,10 @@ public class JPQLGenerator {
        ReplaceMethodCallExpression e = (ReplaceMethodCallExpression) expression;
  
        return String.format(
@@ -332,9 +451,9 @@ diff -ru --strip-trailing-cr ../odata4j/odata4j-core/src/main/java/org/odata4j/p
            toJpql(e.getTarget()),
            toJpql(e.getFind()),
            toJpql(e.getReplace()));
-@@ -193,7 +225,10 @@
+@@ -193,7 +225,10 @@ public class JPQLGenerator {
  
-       // TODO: don't work while HSQL implementation expecting ROUND(a ,b)
+       // TODO: doesn't work, HSQL implementation expecting ROUND(a ,b)
        return String.format(
 +/*--------------------------- sisu-odata4j-patch ---------------------------*\
            "FUNC('ROUND', %s)",
@@ -343,7 +462,7 @@ diff -ru --strip-trailing-cr ../odata4j/odata4j-core/src/main/java/org/odata4j/p
            toJpql(e.getTarget()));
      }
  
-@@ -271,7 +306,10 @@
+@@ -270,7 +305,10 @@ public class JPQLGenerator {
        value = value.replace("'", "");
  
        return String.format(
@@ -354,7 +473,7 @@ diff -ru --strip-trailing-cr ../odata4j/odata4j-core/src/main/java/org/odata4j/p
            toJpql(e.getTarget()),
            value);
      }
-@@ -283,7 +321,10 @@
+@@ -282,7 +320,10 @@ public class JPQLGenerator {
        value = value.replace("'", "");
  
        return String.format(
@@ -365,7 +484,7 @@ diff -ru --strip-trailing-cr ../odata4j/odata4j-core/src/main/java/org/odata4j/p
            toJpql(e.getTarget()),
            value);
      }
-@@ -295,7 +336,10 @@
+@@ -294,7 +335,10 @@ public class JPQLGenerator {
        value = value.replace("'", "");
  
        return String.format(
@@ -376,7 +495,7 @@ diff -ru --strip-trailing-cr ../odata4j/odata4j-core/src/main/java/org/odata4j/p
            toJpql(e.getTarget()),
            value);
      }
-@@ -317,12 +361,18 @@
+@@ -316,12 +360,18 @@ public class JPQLGenerator {
  
      if (expression instanceof ParenExpression) {
        ParenExpression e = (ParenExpression) expression;
@@ -395,10 +514,11 @@ diff -ru --strip-trailing-cr ../odata4j/odata4j-core/src/main/java/org/odata4j/p
      }
  
      throw new UnsupportedOperationException("unsupported expression " + expression);
-diff -ru --strip-trailing-cr ../odata4j/odata4j-core/src/main/java/org/odata4j/producer/resources/OptionsQueryParser.java src/main/java/org/odata4j/producer/resources/OptionsQueryParser.java
---- ../odata4j/odata4j-core/src/main/java/org/odata4j/producer/resources/OptionsQueryParser.java	2011-11-29 00:21:37.000000000 +0000
-+++ src/main/java/org/odata4j/producer/resources/OptionsQueryParser.java	2012-01-13 14:20:04.000000000 +0000
-@@ -9,6 +9,9 @@
+diff --git a/src/main/java/org/odata4j/producer/resources/OptionsQueryParser.java b/src/main/java/org/odata4j/producer/resources/OptionsQueryParser.java
+index f52aefd..e442fec 100644
+--- a/src/main/java/org/odata4j/producer/resources/OptionsQueryParser.java
++++ b/src/main/java/org/odata4j/producer/resources/OptionsQueryParser.java
+@@ -9,6 +9,9 @@ import javax.ws.rs.core.UriInfo;
  import org.odata4j.expression.BoolCommonExpression;
  import org.odata4j.expression.CommonExpression;
  import org.odata4j.expression.EntitySimpleProperty;
@@ -408,7 +528,7 @@ diff -ru --strip-trailing-cr ../odata4j/odata4j-core/src/main/java/org/odata4j/p
  import org.odata4j.expression.ExpressionParser;
  import org.odata4j.expression.OrderByExpression;
  import org.odata4j.producer.InlineCount;
-@@ -39,7 +42,10 @@
+@@ -39,7 +42,10 @@ public class OptionsQueryParser {
      }
      CommonExpression ce = ExpressionParser.parse(filter);
      if (!(ce instanceof BoolCommonExpression)) {

@@ -9,6 +9,7 @@ import java.util.Map;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 
 import org.odata4j.core.ODataConstants;
@@ -29,6 +30,7 @@ import org.odata4j.producer.CollectionResponse;
 import org.odata4j.producer.ComplexObjectResponse;
 import org.odata4j.producer.EntitiesResponse;
 import org.odata4j.producer.EntityResponse;
+import org.odata4j.producer.ODataContextImpl;
 import org.odata4j.producer.ODataProducer;
 import org.odata4j.producer.PropertyResponse;
 import org.odata4j.producer.QueryInfo;
@@ -60,6 +62,7 @@ public class FunctionResource extends BaseResource {
       ODataHttpMethod callingMethod,
       HttpHeaders httpHeaders,
       UriInfo uriInfo,
+      SecurityContext securityContext,
       ODataProducer producer,
       String functionName,
       String format,
@@ -80,7 +83,7 @@ public class FunctionResource extends BaseResource {
       }
     }
 
-    BaseResponse response = producer.callFunction(
+    BaseResponse response = producer.callFunction(ODataContextImpl.builder().aspect(httpHeaders).aspect(securityContext).aspect(producer).build(),
         function, getFunctionParameters(function, queryInfo.customOptions), queryInfo);
 
     if (response == null) {
@@ -137,7 +140,15 @@ public class FunctionResource extends BaseResource {
         fw.write(uriInfo, sw, collectionResponse);
         fwBase = fw;
       }
+    } else if (response instanceof EntitiesResponse) {
+      FormatWriter<EntitiesResponse> fw = FormatWriterFactory.getFormatWriter(
+          EntitiesResponse.class,
+          httpHeaders.getAcceptableMediaTypes(),
+          format,
+          callback);
 
+      fw.write(uriInfo, sw, (EntitiesResponse) response);
+      fwBase = fw;
     } else if (response instanceof PropertyResponse) {
       FormatWriter<PropertyResponse> fw =
           FormatWriterFactory.getFormatWriter(

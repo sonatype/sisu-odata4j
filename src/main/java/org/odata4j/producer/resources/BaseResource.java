@@ -25,8 +25,10 @@ import org.odata4j.format.FormatParser;
 import org.odata4j.format.FormatParserFactory;
 import org.odata4j.format.Settings;
 import org.odata4j.internal.InternalUtil;
+import org.odata4j.producer.ODataContext;
 import org.odata4j.producer.ODataProducer;
 import org.odata4j.producer.OMediaLinkExtension;
+import org.odata4j.producer.OMediaLinkExtensions;
 
 public abstract class BaseResource {
 
@@ -65,19 +67,21 @@ public abstract class BaseResource {
   }
 
   // some helpers for media link entries
-  protected OMediaLinkExtension getMediaLinkExtension(HttpHeaders httpHeaders, UriInfo uriInfo, EdmEntitySet entitySet, ODataProducer producer) {
-    OMediaLinkExtension mediaLinkExtension = producer.findExtension(OMediaLinkExtension.class);
+  protected OMediaLinkExtension getMediaLinkExtension(HttpHeaders httpHeaders, UriInfo uriInfo, EdmEntitySet entitySet, ODataProducer producer,
+      ODataContext context) {
 
-    if (mediaLinkExtension == null) {
+    OMediaLinkExtensions mediaLinkExtensions = producer.findExtension(OMediaLinkExtensions.class);
+
+    if (mediaLinkExtensions == null) {
       throw new NotImplementedException();
     }
 
-    return mediaLinkExtension;
+    return mediaLinkExtensions.create(context);
   }
 
   protected OEntity createOrUpdateMediaLinkEntry(HttpHeaders httpHeaders,
       UriInfo uriInfo, EdmEntitySet entitySet, ODataProducer producer,
-      InputStream payload, OEntityKey key) throws IOException {
+      InputStream payload, OEntityKey key, ODataContext context) throws IOException {
 
     /*
      * this post has a great descriptions of the twists and turns of creating
@@ -85,17 +89,17 @@ public abstract class BaseResource {
      */
 
     // first, the producer must support OMediaLinkExtension
-    OMediaLinkExtension mediaLinkExtension = getMediaLinkExtension(httpHeaders, uriInfo, entitySet, producer);
+    OMediaLinkExtension mediaLinkExtension = getMediaLinkExtension(httpHeaders, uriInfo, entitySet, producer, context);
 
     // get a media link entry from the extension
     OEntity mle = key == null
-        ? mediaLinkExtension.createMediaLinkEntry(entitySet, httpHeaders)
-        : mediaLinkExtension.getMediaLinkEntryForUpdateOrDelete(entitySet, key, httpHeaders);
+        ? mediaLinkExtension.createMediaLinkEntry(context, entitySet, httpHeaders)
+        : mediaLinkExtension.getMediaLinkEntryForUpdateOrDelete(context, entitySet, key, httpHeaders);
 
     // now get a stream we can write the incoming bytes into.
     OutputStream outStream = key == null
-        ? mediaLinkExtension.getOutputStreamForMediaLinkEntryCreate(mle, null /*etag*/, null /*QueryInfo, may get rid of this */)
-        : mediaLinkExtension.getOutputStreamForMediaLinkEntryUpdate(mle, null, null);
+        ? mediaLinkExtension.getOutputStreamForMediaLinkEntryCreate(context, mle, null /*etag*/, null /*QueryInfo, may get rid of this */)
+        : mediaLinkExtension.getOutputStreamForMediaLinkEntryUpdate(context, mle, null, null);
 
     // write the stream
     try {
@@ -105,6 +109,6 @@ public abstract class BaseResource {
     }
 
     // more info about the mle may be available now.
-    return mediaLinkExtension.updateMediaLinkEntry(mle, outStream);
+    return mediaLinkExtension.updateMediaLinkEntry(context, mle, outStream);
   }
 }

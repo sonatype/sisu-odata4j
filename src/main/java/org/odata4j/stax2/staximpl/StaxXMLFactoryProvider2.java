@@ -176,17 +176,28 @@ public class StaxXMLFactoryProvider2 extends XMLFactoryProvider2 {
 
     private String getEventTypeName() {
       switch (real.getEventType()) {
-        case XMLStreamConstants.START_ELEMENT: return "START_ELEMENT";
-        case XMLStreamConstants.END_ELEMENT: return "END_ELEMENT";
-        case XMLStreamConstants.CHARACTERS: return "CHARACTERS";
-        case XMLStreamConstants.ATTRIBUTE: return "ATTRIBUTE";
-        case XMLStreamConstants.NAMESPACE: return "NAMESPACE";
-        case XMLStreamConstants.PROCESSING_INSTRUCTION: return "PROCESSING_INSTRUCTION";
-        case XMLStreamConstants.COMMENT: return "COMMENT";
-        case XMLStreamConstants.START_DOCUMENT: return "START_DOCUMENT";
-        case XMLStreamConstants.END_DOCUMENT: return "END_DOCUMENT";
-        case XMLStreamConstants.DTD: return "DTD";
-        default: return "UNKNOWN TYPE " + real.getEventType();
+      case XMLStreamConstants.START_ELEMENT:
+        return "START_ELEMENT";
+      case XMLStreamConstants.END_ELEMENT:
+        return "END_ELEMENT";
+      case XMLStreamConstants.CHARACTERS:
+        return "CHARACTERS";
+      case XMLStreamConstants.ATTRIBUTE:
+        return "ATTRIBUTE";
+      case XMLStreamConstants.NAMESPACE:
+        return "NAMESPACE";
+      case XMLStreamConstants.PROCESSING_INSTRUCTION:
+        return "PROCESSING_INSTRUCTION";
+      case XMLStreamConstants.COMMENT:
+        return "COMMENT";
+      case XMLStreamConstants.START_DOCUMENT:
+        return "START_DOCUMENT";
+      case XMLStreamConstants.END_DOCUMENT:
+        return "END_DOCUMENT";
+      case XMLStreamConstants.DTD:
+        return "DTD";
+      default:
+        return "UNKNOWN TYPE " + real.getEventType();
       }
     }
 
@@ -235,7 +246,7 @@ public class StaxXMLFactoryProvider2 extends XMLFactoryProvider2 {
 
     @Override
     public QName2 getName() {
-      return new QName2(real.getName().getNamespaceURI(), real.getName().getLocalPart());
+      return new QName2(real.getName().getNamespaceURI(), real.getName().getLocalPart(), real.getName().getPrefix());
     }
   }
 
@@ -248,7 +259,7 @@ public class StaxXMLFactoryProvider2 extends XMLFactoryProvider2 {
 
     @Override
     public QName2 getName() {
-      return new QName2(real.getName().getNamespaceURI(), real.getName().getLocalPart());
+      return new QName2(real.getName().getNamespaceURI(), real.getName().getLocalPart(), real.getName().getPrefix());
     }
 
     @Override
@@ -266,7 +277,7 @@ public class StaxXMLFactoryProvider2 extends XMLFactoryProvider2 {
 
     @Override
     public Enumerable<Attribute2> getAttributes() {
-      Iterator i = real.getAttributes();
+      Iterator<?> i = real.getAttributes();
       List<Attribute2> atts = new ArrayList<Attribute2>();
       while (i.hasNext()) {
         atts.add(new StaxAttribute2((Attribute) i.next()));
@@ -276,7 +287,7 @@ public class StaxXMLFactoryProvider2 extends XMLFactoryProvider2 {
 
     @Override
     public Enumerable<Namespace2> getNamespaces() {
-      Iterator i = real.getNamespaces();
+      Iterator<?> i = real.getNamespaces();
       List<Namespace2> namespaces = new ArrayList<Namespace2>();
       while (i.hasNext()) {
         namespaces.add(new StaxNamespace2((Namespace) i.next()));

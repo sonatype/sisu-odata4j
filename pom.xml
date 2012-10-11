@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.sonatype.forge</groupId>
     <artifactId>forge-parent</artifactId>
-    <version>11</version>
+    <version>12</version>
   </parent>
 
   <groupId>org.sonatype.sisu</groupId>
@@ -56,7 +56,7 @@
     <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
-      <version>1.7</version>
+      <version>1.6</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

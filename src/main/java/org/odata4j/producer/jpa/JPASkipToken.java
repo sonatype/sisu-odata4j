@@ -110,7 +110,10 @@ public class JPASkipToken {
 /*--------------------------------------------------------------------------*/
             Expression.literal(keyProperty.getValue()));
 
+/*--------------------------- sisu-odata4j-patch ---------------------------*\
         for (int j = 0; j < i; j++) {
+*/      for (int j = i-1; j >= 0; j--) {
+/*--------------------------------------------------------------------------*/
           OProperty<?> earlierKeyProperty = keyProperties.get(j);
           // k.x = kvalue.x
           BoolCommonExpression eq = Expression.eq(
@@ -136,7 +139,10 @@ public class JPASkipToken {
     // PASS2  (a > avalue), (a = avalue and b > bvalue), ... (a = avalue and b = bvalue ... and k > kvalue)
     for (int i = 1; i < predicates.size(); i++) {
       BoolCommonExpression predicate = predicates.get(i);
+/*--------------------------- sisu-odata4j-patch ---------------------------*\
       for (int j = 0; j < i; j++) {
+*/    for (int j = i-1; j >= 0; j--) {
+/*--------------------------------------------------------------------------*/
         OrderByExpression orderBy = orderByList.get(j);
         BoolCommonExpression eq = Expression.eq(orderBy.getExpression(), orderByValues.get(j));
         predicate = Expression.and(eq, predicate);

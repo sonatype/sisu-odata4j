@@ -314,7 +314,7 @@ index e2316a5..e4a1864 100644
    @SuppressWarnings("unchecked")
    private static <T> Constructor<T> findDefaultDeclaredConstructor(
 diff --git a/src/main/java/org/odata4j/producer/jpa/JPASkipToken.java b/src/main/java/org/odata4j/producer/jpa/JPASkipToken.java
-index f8f1c38..cf7d282 100644
+index f8f1c38..9ec6caf 100644
 --- a/src/main/java/org/odata4j/producer/jpa/JPASkipToken.java
 +++ b/src/main/java/org/odata4j/producer/jpa/JPASkipToken.java
 @@ -36,7 +36,10 @@ public class JPASkipToken {
@@ -339,7 +339,7 @@ index f8f1c38..cf7d282 100644
      if (entityKey.getKeyType() == KeyType.SINGLE) {
  
        LiteralExpression entityKeyValue = Expression.literal(entityKey.asSingleValue());
-@@ -91,25 +97,37 @@ public class JPASkipToken {
+@@ -91,25 +97,40 @@ public class JPASkipToken {
        // k > keyvalue actually means (k.a > kvalue.a) or (k.a = kvalue.a and k.b > kvalue.b) ...
        List<OProperty<?>> keyProperties = new ArrayList<OProperty<?>>(entityKey.asComplexProperties());
        BoolCommonExpression keyPredicate = null;
@@ -356,7 +356,10 @@ index f8f1c38..cf7d282 100644
 +/*--------------------------------------------------------------------------*/
              Expression.literal(keyProperty.getValue()));
  
++/*--------------------------- sisu-odata4j-patch ---------------------------*\
          for (int j = 0; j < i; j++) {
++*/      for (int j = i-1; j >= 0; j--) {
++/*--------------------------------------------------------------------------*/
            OProperty<?> earlierKeyProperty = keyProperties.get(j);
            // k.x = kvalue.x
            BoolCommonExpression eq = Expression.eq(
@@ -377,7 +380,18 @@ index f8f1c38..cf7d282 100644
        }
  
        predicates.add(keyPredicate);
-@@ -130,7 +148,10 @@ public class JPASkipToken {
+@@ -118,7 +139,10 @@ public class JPASkipToken {
+     // PASS2  (a > avalue), (a = avalue and b > bvalue), ... (a = avalue and b = bvalue ... and k > kvalue)
+     for (int i = 1; i < predicates.size(); i++) {
+       BoolCommonExpression predicate = predicates.get(i);
++/*--------------------------- sisu-odata4j-patch ---------------------------*\
+       for (int j = 0; j < i; j++) {
++*/    for (int j = i-1; j >= 0; j--) {
++/*--------------------------------------------------------------------------*/
+         OrderByExpression orderBy = orderByList.get(j);
+         BoolCommonExpression eq = Expression.eq(orderBy.getExpression(), orderByValues.get(j));
+         predicate = Expression.and(eq, predicate);
+@@ -130,7 +154,10 @@ public class JPASkipToken {
      BoolCommonExpression rt = predicates.get(0);
      for (int i = 1; i < predicates.size(); i++)
        rt = Expression.or(rt, predicates.get(i));

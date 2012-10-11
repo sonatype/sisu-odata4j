@@ -124,7 +124,10 @@ public class JPASkipToken {
         if (keyPredicate == null)
           keyPredicate = subPredicate;
         else
+/*--------------------------- sisu-odata4j-patch ---------------------------*\
           keyPredicate = Expression.or(keyPredicate, subPredicate);
+*/        keyPredicate = Expression.boolParen(Expression.or(keyPredicate, subPredicate));
+/*--------------------------------------------------------------------------*/
       }
 
       predicates.add(keyPredicate);
@@ -145,7 +148,10 @@ public class JPASkipToken {
     BoolCommonExpression rt = predicates.get(0);
     for (int i = 1; i < predicates.size(); i++)
       rt = Expression.or(rt, predicates.get(i));
+/*--------------------------- sisu-odata4j-patch ---------------------------*\
     return Expression.boolParen(rt);
+*/  return rt;
+/*--------------------------------------------------------------------------*/
   }
 
 }

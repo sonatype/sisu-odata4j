@@ -134,12 +134,14 @@ public class ExpressionTest {
 
     t(Expression.simpleProperty("LastName"), "LastName");
     t(Expression.simpleProperty("LastName2"), "   LastName2  ");
+    t(Expression.simpleProperty("*"), "*");
 
     t(Expression.eq(Expression.simpleProperty("LastName"), Expression.string("foo")), "LastName eq 'foo'");
     t(Expression.eq(Expression.simpleProperty("LastName"), Expression.string("foo")), "    LastName    eq     'foo'   ");
     t(Expression.eq(Expression.string("foo"), Expression.simpleProperty("LastName")), "'foo' eq LastName");
 
     t(Expression.ne(Expression.simpleProperty("LastName"), Expression.string("foo")), "LastName ne 'foo'");
+    t(Expression.ne(Expression.simpleProperty("entity.LastName"), Expression.string("foo")), "entity.LastName ne 'foo'");
 
     EqExpression exp = Expression.eq(Expression.simpleProperty("a"), Expression.integral(1));
     t(Expression.and(exp, exp), "a eq 1 and a eq 1");
@@ -548,5 +550,12 @@ public class ExpressionTest {
             Expression.simpleProperty("t"),
             Expression.string("Beautiful"))),
         "Tags/any(t:t eq 'Beautiful')");
+  }
+
+  @Test
+  public void testWildcardSimpleProperty() {
+    Assert.assertTrue(Expression.simpleProperty("*").isSelectionMatch("SomeProperty"));
+    Assert.assertTrue(Expression.simpleProperty("Actors/*").isSelectionMatch("Actors/SomeProperty"));
+    Assert.assertFalse(Expression.simpleProperty("Actors/*").isSelectionMatch("SomeProperty"));
   }
 }

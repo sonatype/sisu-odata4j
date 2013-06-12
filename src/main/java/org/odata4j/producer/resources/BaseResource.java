@@ -11,6 +11,8 @@ import java.io.UnsupportedEncodingException;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.ext.ContextResolver;
+import javax.ws.rs.ext.Providers;
 
 import org.odata4j.core.ODataConstants;
 import org.odata4j.core.ODataVersion;
@@ -42,7 +44,7 @@ public abstract class BaseResource {
 
   private static OEntity convertFromString(String requestEntity, MediaType type, ODataVersion version, EdmDataServices metadata, String entitySetName, OEntityKey entityKey) throws NotAcceptableException {
     FormatParser<Entry> parser = FormatParserFactory.getParser(Entry.class, type,
-        new Settings(version, metadata, entitySetName, entityKey, null, false));
+        new Settings(version, metadata, entitySetName, entityKey, false));
     Entry entry = parser.parse(new StringReader(requestEntity));
     return entry.getEntity();
   }
@@ -53,7 +55,7 @@ public abstract class BaseResource {
 
     ODataVersion version = InternalUtil.getDataServiceVersion(httpHeaders.getRequestHeaders().getFirst(ODataConstants.Headers.DATA_SERVICE_VERSION));
     FormatParser<Entry> parser = FormatParserFactory.getParser(Entry.class, httpHeaders.getMediaType(),
-        new Settings(version, metadata, entitySetName, entityKey, null, false));
+        new Settings(version, metadata, entitySetName, entityKey, false));
 
     String charset = httpHeaders.getMediaType().getParameters().get("charset");
     if (charset == null) {
@@ -110,5 +112,14 @@ public abstract class BaseResource {
 
     // more info about the mle may be available now.
     return mediaLinkExtension.updateMediaLinkEntry(context, mle, outStream);
+  }
+
+  /**
+   * Not all the jax-rs engines can not directly inject ContextResolvers (not defined by JSR-311) classes
+   * into resources, however they support Context injection, from which ContextResolvers can be queried
+   */
+  protected ODataProducer getODataProducer(Providers providers) {
+    ContextResolver<ODataProducer> producerResolver = providers.getContextResolver(ODataProducer.class,MediaType.WILDCARD_TYPE);
+    return producerResolver.getContext(ODataProducer.class);
   }
 }

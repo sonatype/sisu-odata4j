@@ -85,8 +85,8 @@
         <groupId>com.mycila.maven-license-plugin</groupId>
         <artifactId>maven-license-plugin</artifactId>
         <configuration>
-          <!-- ... patched external project ... -->
-          <excludes><exclude>**</exclude></excludes>
+          <!-- patched external project -->
+          <failIfMissing>false</failIfMissing>
         </configuration>
       </plugin>
     </plugins>

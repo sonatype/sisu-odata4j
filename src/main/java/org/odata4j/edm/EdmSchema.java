@@ -168,6 +168,11 @@ public class EdmSchema extends EdmItem {
       return this;
     }
 
+    public Builder addComplexTypes(EdmComplexType.Builder... complexTypes) {
+      this.complexTypes.addAll(Arrays.asList(complexTypes));
+      return this;
+    }
+
     public Builder addAssociations(Collection<EdmAssociation.Builder> associations) {
       this.associations.addAll(associations);
       return this;
@@ -211,6 +216,17 @@ public class EdmSchema extends EdmItem {
         }
       }
       return null;
+    }
+
+    public String dealias(String fqName) {
+      if (alias == null || alias.length() == 0
+          || fqName == null || fqName.length() == 0
+          || namespace == null || namespace.length() == 0)
+        return fqName;
+      String aliasPrefix = alias + ".";
+      if (fqName.startsWith(aliasPrefix))
+        return namespace + "." + fqName.substring(aliasPrefix.length());
+      return fqName;
     }
   }
 

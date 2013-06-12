@@ -8,7 +8,7 @@ import org.odata4j.repack.org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.binary.Hex;
 /*--------------------------------------------------------------------------*/
 
-public class FilterExpressionVisitor implements ExpressionVisitor {
+public class FilterExpressionVisitor extends PreOrderVisitor {
 
   // only literals supported, so this suffices for now
   private String fragment;

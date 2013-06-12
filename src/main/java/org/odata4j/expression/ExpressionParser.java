@@ -793,9 +793,10 @@ public class ExpressionParser {
         end = readQuotedString(value, current + 1);
         rt.add(new Token(TokenType.QUOTED_STRING, value.substring(current, end)));
         current = end;
-      } else if (Character.isLetter(c)) {
+      } else if (Character.isLetter(c) || c == '*') {
         end = readWord(value, current + 1);
-        rt.add(new Token(TokenType.WORD, value.substring(current, end)));
+        String tokenString = value.substring(current, end);
+        rt.add(new Token(TokenType.WORD, tokenString));
         current = end;
       } else if (Character.isDigit(c)) {
         end = readDigits(value, current + 1);
@@ -844,7 +845,7 @@ public class ExpressionParser {
   private static int readWord(String value, int start) {
     int rt = start;
     while (rt < value.length()
-        && (Character.isLetterOrDigit(value.charAt(rt)) || value.charAt(rt) == '/' || value.charAt(rt) == '_')) {
+        && (Character.isLetterOrDigit(value.charAt(rt)) || value.charAt(rt) == '/' || value.charAt(rt) == '_' || value.charAt(rt) == '.' || value.charAt(rt) == '*')) {
       rt++;
     }
     return rt;

@@ -81,6 +81,14 @@
           <target>1.6</target>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>com.mycila.maven-license-plugin</groupId>
+        <artifactId>maven-license-plugin</artifactId>
+        <configuration>
+          <!-- ... patched external project ... -->
+          <excludes><exclude>**</exclude></excludes>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 
